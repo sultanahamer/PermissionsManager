@@ -7,8 +7,35 @@ import java.util.Arrays;
  */
 
 public class AndroidApplication {
-    String name;
-    String[] permissions;
+    private String name;
+
+    private String[] permissions;
+
+    private int warnings;
+
+    public int getWarnings() {
+        return warnings;
+    }
+
+    public void setWarnings(int warnings) {
+        this.warnings = warnings;
+    }
+
+    public String[] getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(String[] permissions) {
+        this.permissions = permissions;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public AndroidApplication(String name, String[] permissions) {
         this.name  = name;
