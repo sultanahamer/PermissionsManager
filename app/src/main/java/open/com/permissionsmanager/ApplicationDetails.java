@@ -39,6 +39,7 @@ public class ApplicationDetails extends AppCompatActivity {
     }
 
     private void addApplicationDetails() {
+        final ApplicationsDatabase applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(ApplicationDetails.this);
         setTitle(application.getName());
         ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
         ArrayAdapter arrayAdapter = new ArrayAdapter<String>(this, R.layout.application_info_row){
@@ -50,8 +51,10 @@ public class ApplicationDetails extends AppCompatActivity {
                     reusableView = layoutInflater.inflate(R.layout.application_info_row, parent, false);
                 TextView permission_textView = (TextView) reusableView.findViewById(R.id.title);
                 ImageView warningImage = (ImageView) reusableView.findViewById(R.id.warning_image);
-                if(ApplicationsDatabase.getApplicationsDatabase(ApplicationDetails.this).allowedPermissions.containsKey(permission))
+                if(applicationsDatabase.allowedPermissions.containsKey(permission))
                     warningImage.setVisibility(View.INVISIBLE);
+                else
+                    warningImage.setVisibility(View.VISIBLE);
                 permission_textView.setText(permission);
                 return reusableView;
             }
