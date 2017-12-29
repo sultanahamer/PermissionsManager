@@ -1,6 +1,6 @@
 package open.com.permissionsmanager;
 
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by sultanm on 12/28/17.
@@ -10,10 +10,10 @@ public class AndroidApplication {
 
     private String packageName;
     private String name;
-    private String[] permissions;
+    private List<String> permissions;
     private int warnings;
 
-    public AndroidApplication(String applicationName, String packageName, String[] requestedPermissions) {
+    public AndroidApplication(String applicationName, String packageName, List requestedPermissions) {
         this.name  = applicationName;
         this.permissions = requestedPermissions;
         this.packageName = packageName;
@@ -35,11 +35,11 @@ public class AndroidApplication {
         this.warnings = warnings;
     }
 
-    public String[] getPermissions() {
+    public List<String> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(String[] permissions) {
+    public void setPermissions(List permissions) {
         this.permissions = permissions;
     }
 
@@ -51,10 +51,4 @@ public class AndroidApplication {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return "name='" + name + '\'' +
-                ", permissions=" + Arrays.toString(permissions) +
-                '}';
-    }
 }

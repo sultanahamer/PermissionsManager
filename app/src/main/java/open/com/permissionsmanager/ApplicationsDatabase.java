@@ -50,9 +50,19 @@ public class ApplicationsDatabase {
     private AndroidApplication getAndroidApplication(PackageManager pm, ApplicationInfo applicationInfo) throws PackageManager.NameNotFoundException {
         PackageInfo packageInfo = null;
         packageInfo = pm.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS);
-        AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, packageInfo.requestedPermissions);
+        List<String> grantedPermissions = new ArrayList<>();
+        int warnings = 0;
+        if(packageInfo.requestedPermissions != null)
+            for(String permission : packageInfo.requestedPermissions){
+                if(pm.checkPermission(permission, packageInfo.packageName) == PackageManager.PERMISSION_GRANTED){
+                    grantedPermissions.add(permission);
+                    if(!allowedPermissions.containsKey(permission)) warnings ++;
+                }
+            }
 
-        androidApplication.setWarnings(getWarnings(packageInfo, pm));
+        AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, grantedPermissions);
+
+        androidApplication.setWarnings(warnings);
         return androidApplication;
     }
 
@@ -64,17 +74,6 @@ public class ApplicationsDatabase {
             System.out.println("in exception, return name: "+ applicationInfo.packageName);
             return applicationInfo.packageName;
         }
-    }
-
-    private int getWarnings(PackageInfo packageInfo, PackageManager pm) {
-        int warnings = 0;
-        String[] requestedPermissions = packageInfo.requestedPermissions;
-        if(requestedPermissions == null) return 0;
-        for(String permission : requestedPermissions){
-            if(!allowedPermissions.containsKey(permission) && pm.checkPermission(permission, packageInfo.packageName) == PackageManager.PERMISSION_GRANTED)
-                warnings ++;
-        }
-        return warnings;
     }
 
     public void recomputePermissions(){
