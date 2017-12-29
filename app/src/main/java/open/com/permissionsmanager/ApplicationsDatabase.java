@@ -31,6 +31,7 @@ public class ApplicationsDatabase {
     }
 
     public void updateApplicationsDatabase() {
+        applications.clear();
         PackageManager pm = context.getPackageManager();
         SharedPreferences allowedPermissionsPreferences = context.getSharedPreferences(context.getString(R.string.allowed_permissions), Context.MODE_PRIVATE);
         allowedPermissions = allowedPermissionsPreferences.getAll();
@@ -88,5 +89,12 @@ public class ApplicationsDatabase {
                     e.printStackTrace();
                 }
         }
+    }
+
+    public void ignorePermission(String permission){
+        SharedPreferences allowedPermissionsPreferences = context.getSharedPreferences(context.getString(R.string.allowed_permissions), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = allowedPermissionsPreferences.edit();
+        editor.putBoolean(permission, true);
+        editor.commit();
     }
 }

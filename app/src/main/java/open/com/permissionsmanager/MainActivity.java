@@ -48,5 +48,6 @@ public class MainActivity extends AppCompatActivity {
             listOfApplications_listView.setAdapter(adapter);
         }
         adapter.addAllApplications(applicationsDatabase.applications);
+        adapter.notifyDataSetChanged();
     }
 }

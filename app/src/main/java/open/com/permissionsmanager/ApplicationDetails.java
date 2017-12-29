@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,11 +27,18 @@ public class ApplicationDetails extends AppCompatActivity {
         int applicationIndex = intent.getIntExtra(APPLICATION_INDEX, -1);
         if(applicationIndex == -1)
             finish();
-        this.application = ApplicationsDatabase.getApplicationsDatabase(this).applications.get(applicationIndex);
-        showApplicationDetails();
+        application = ApplicationsDatabase.getApplicationsDatabase(this).applications.get(applicationIndex);
+        addApplicationDetails();
+        ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
+        permissionsList_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ApplicationsDatabase.getApplicationsDatabase(ApplicationDetails.this).ignorePermission(application.getPermissions().get(position));
+            }
+        });
     }
 
-    private void showApplicationDetails() {
+    private void addApplicationDetails() {
         setTitle(application.getName());
         ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
         ArrayAdapter arrayAdapter = new ArrayAdapter<String>(this, R.layout.application_info_row){
@@ -40,6 +49,9 @@ public class ApplicationDetails extends AppCompatActivity {
                 if(reusableView == null)
                     reusableView = layoutInflater.inflate(R.layout.application_info_row, parent, false);
                 TextView permission_textView = (TextView) reusableView.findViewById(R.id.title);
+                ImageView warningImage = (ImageView) reusableView.findViewById(R.id.warning_image);
+                if(ApplicationsDatabase.getApplicationsDatabase(ApplicationDetails.this).allowedPermissions.containsKey(permission))
+                    warningImage.setVisibility(View.INVISIBLE);
                 permission_textView.setText(permission);
                 return reusableView;
             }
