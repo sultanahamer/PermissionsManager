@@ -27,7 +27,7 @@ public class ApplicationsArrayAdapter extends ArrayAdapter<AndroidApplication> {
         AndroidApplication androidApplication = getItem(position);
         if(reusableView == null)
             reusableView = layoutInflater.inflate(R.layout.application_info_row, parent, false);
-        TextView applicationName = (TextView) reusableView.findViewById(R.id.application_name);
+        TextView applicationName = (TextView) reusableView.findViewById(R.id.title);
         applicationName.setText(androidApplication.getName());
         TextView warningCount = (TextView) reusableView.findViewById(R.id.warning_count_text);
         warningCount.setText(String.valueOf(androidApplication.getWarnings()));

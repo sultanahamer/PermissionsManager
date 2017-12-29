@@ -3,7 +3,11 @@ package open.com.permissionsmanager;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+
+import static open.com.permissionsmanager.ApplicationDetails.APPLICATION_INDEX;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -17,6 +21,14 @@ public class MainActivity extends AppCompatActivity {
         Intent serviceStartIntent = new Intent(getApplicationContext(), PermissionValidationService.class);
         startService(serviceStartIntent);
         listOfApplications_listView = (ListView) findViewById(R.id.listOfApplications);
+        listOfApplications_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intentToShowApplicationDetails = new Intent(MainActivity.this, ApplicationDetails.class);
+                intentToShowApplicationDetails.putExtra(APPLICATION_INDEX, position);
+                startActivity(intentToShowApplicationDetails);
+            }
+        });
     }
 
     private void getApplicationsDatabase() {

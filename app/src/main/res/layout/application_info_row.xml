@@ -16,7 +16,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/warning_count_text"
-        android:text="1"
         android:width="30dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
@@ -26,7 +25,7 @@
         android:layout_marginTop="5dp" />
 
     <TextView
-        android:id="@+id/application_name"
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"

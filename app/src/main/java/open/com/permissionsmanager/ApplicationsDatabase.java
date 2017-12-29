@@ -52,7 +52,7 @@ public class ApplicationsDatabase {
         packageInfo = pm.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS);
         AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, packageInfo.requestedPermissions);
 
-        androidApplication.setWarnings(getWarnings(packageInfo));
+        androidApplication.setWarnings(getWarnings(packageInfo, pm));
         return androidApplication;
     }
 
@@ -66,12 +66,12 @@ public class ApplicationsDatabase {
         }
     }
 
-    private int getWarnings(PackageInfo packageInfo) {
+    private int getWarnings(PackageInfo packageInfo, PackageManager pm) {
         int warnings = 0;
         String[] requestedPermissions = packageInfo.requestedPermissions;
         if(requestedPermissions == null) return 0;
         for(String permission : requestedPermissions){
-            if(!allowedPermissions.containsKey(permission))
+            if(!allowedPermissions.containsKey(permission) && pm.checkPermission(permission, packageInfo.packageName) == PackageManager.PERMISSION_GRANTED)
                 warnings ++;
         }
         return warnings;

@@ -19,7 +19,9 @@
         <service
             android:name=".PermissionValidationService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".ApplicationDetails"></activity>
     </application>
 
 </manifest>
