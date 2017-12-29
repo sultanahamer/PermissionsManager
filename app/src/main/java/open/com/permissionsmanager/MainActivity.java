@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView applicationName = (TextView) reusableView.findViewById(R.id.application_name);
                 applicationName.setText(androidApplication.getName());
                 TextView warningCount = (TextView) reusableView.findViewById(R.id.warning_count_text);
-                warningCount.setText(androidApplication.getWarnings() + "");
+                warningCount.setText(String.valueOf(androidApplication.getWarnings()));
                 return reusableView;
             }
         };
