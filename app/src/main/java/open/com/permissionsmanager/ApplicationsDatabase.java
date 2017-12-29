@@ -91,10 +91,19 @@ public class ApplicationsDatabase {
         }
     }
 
+    public Map<String, ?> getAllowedPermissions(){
+        return context.getSharedPreferences(context.getString(R.string.allowed_permissions), Context.MODE_PRIVATE).getAll();
+    }
+
     public void ignorePermission(String permission){
         SharedPreferences allowedPermissionsPreferences = context.getSharedPreferences(context.getString(R.string.allowed_permissions), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = allowedPermissionsPreferences.edit();
         editor.putBoolean(permission, true);
         editor.commit();
+        updateAllowedPermissions();
+    }
+
+    private void updateAllowedPermissions() {
+        allowedPermissions = getAllowedPermissions();
     }
 }
