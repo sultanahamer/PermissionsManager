@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.util.Log;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +22,6 @@ public class ApplicationsDatabase {
     private static ApplicationsDatabase applicationsDatabase;
     private ApplicationsDatabase(Context context){
         this.context = context;
-        SharedPreferences allowedPermissionsPreferences = context.getSharedPreferences(context.getString(R.string.allowed_permissions), Context.MODE_PRIVATE);
-        allowedPermissions = allowedPermissionsPreferences.getAll();
         updateApplicationsDatabase();
     }
     static ApplicationsDatabase getApplicationsDatabase(Context context){
@@ -31,23 +29,31 @@ public class ApplicationsDatabase {
             applicationsDatabase = new ApplicationsDatabase(context);
         return applicationsDatabase;
     }
-    private void updateApplicationsDatabase() {
+
+    public void updateApplicationsDatabase() {
         PackageManager pm = context.getPackageManager();
+        SharedPreferences allowedPermissionsPreferences = context.getSharedPreferences(context.getString(R.string.allowed_permissions), Context.MODE_PRIVATE);
+        allowedPermissions = allowedPermissionsPreferences.getAll();
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         for (ApplicationInfo applicationInfo : packages) {
-            Log.d("test", "App: " + applicationInfo.name + ","+ applicationInfo.className + ","+ applicationInfo.backupAgentName + ","+ " Package: " + applicationInfo.packageName);
+            AndroidApplication androidApplication = null;
             try {
-                PackageInfo packageInfo = pm.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS);
-
-                //Get Permissions
-                AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.requestedPermissions);
-
-                androidApplication.setWarnings(getWarnings(packageInfo));
+                androidApplication = getAndroidApplication(pm, applicationInfo);
                 applications.add(androidApplication);
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    @NonNull
+    private AndroidApplication getAndroidApplication(PackageManager pm, ApplicationInfo applicationInfo) throws PackageManager.NameNotFoundException {
+        PackageInfo packageInfo = null;
+        packageInfo = pm.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS);
+        AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, packageInfo.requestedPermissions);
+
+        androidApplication.setWarnings(getWarnings(packageInfo));
+        return androidApplication;
     }
 
     private String getApplicationName(PackageManager pm, ApplicationInfo applicationInfo) {
@@ -71,4 +77,17 @@ public class ApplicationsDatabase {
         return warnings;
     }
 
+    public void recomputePermissions(){
+        PackageManager pm = context.getPackageManager();
+        for(int i = 0, numberOfApplications = applications.size(); i < numberOfApplications; i++){
+            AndroidApplication application = applications.get(i);
+            if(application.getWarnings() > 0)
+                try {
+                    applications.remove(i);
+                    applications.add(i, getAndroidApplication(pm, pm.getApplicationInfo(application.getPackageName(), PackageManager.GET_META_DATA)));
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+        }
+    }
 }

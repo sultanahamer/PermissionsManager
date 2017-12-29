@@ -7,11 +7,25 @@ import java.util.Arrays;
  */
 
 public class AndroidApplication {
+
+    private String packageName;
     private String name;
-
     private String[] permissions;
-
     private int warnings;
+
+    public AndroidApplication(String applicationName, String packageName, String[] requestedPermissions) {
+        this.name  = applicationName;
+        this.permissions = requestedPermissions;
+        this.packageName = packageName;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
+    }
 
     public int getWarnings() {
         return warnings;
@@ -35,11 +49,6 @@ public class AndroidApplication {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public AndroidApplication(String name, String[] permissions) {
-        this.name  = name;
-        this.permissions = permissions;
     }
 
     @Override
