@@ -18,8 +18,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent serviceStartIntent = new Intent(getApplicationContext(), PermissionValidationService.class);
-        startService(serviceStartIntent);
+//        Intent serviceStartIntent = new Intent(getApplicationContext(), PermissionValidationService.class);
+//        startService(serviceStartIntent);
         listOfApplications_listView = (ListView) findViewById(R.id.listOfApplications);
         listOfApplications_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
