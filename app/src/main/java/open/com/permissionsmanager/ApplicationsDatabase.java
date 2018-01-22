@@ -1,15 +1,18 @@
 package open.com.permissionsmanager;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PermissionInfo;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by sultanm on 12/28/17.
@@ -17,11 +20,15 @@ import java.util.Map;
 
 public class ApplicationsDatabase {
     List<AndroidApplication> applications = new ArrayList<>();
-    Context context;
-    Map<String, ?> allowedPermissions;
+    private Context context;
+    SharedPreferences permissionsManagerSharedPreferences;
+    Set<String> ignoredPermissionsForAllApps;
     private static ApplicationsDatabase applicationsDatabase;
     private ApplicationsDatabase(Context context){
         this.context = context;
+        permissionsManagerSharedPreferences = context.getSharedPreferences(context.getString(R.string.permissions_manager), Context.MODE_PRIVATE);
+        String ignoredPermissionsForAllAppsString = permissionsManagerSharedPreferences.getString(context.getString(R.string.allowed_permissions), new String());
+        ignoredPermissionsForAllApps = Utils.makeHashSet(ignoredPermissionsForAllAppsString, ";");
         updateApplicationsDatabase();
     }
     static ApplicationsDatabase getApplicationsDatabase(Context context){
@@ -33,8 +40,6 @@ public class ApplicationsDatabase {
     public void updateApplicationsDatabase() {
         applications.clear();
         PackageManager pm = context.getPackageManager();
-        SharedPreferences allowedPermissionsPreferences = context.getSharedPreferences(context.getString(R.string.allowed_permissions), Context.MODE_PRIVATE);
-        allowedPermissions = allowedPermissionsPreferences.getAll();
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         for (ApplicationInfo applicationInfo : packages) {
             AndroidApplication androidApplication = null;
@@ -53,15 +58,19 @@ public class ApplicationsDatabase {
         packageInfo = pm.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS);
         List<String> grantedPermissions = new ArrayList<>();
         int warnings = 0;
-        if(packageInfo.requestedPermissions != null)
+        HashSet<String> appSpecificIgnoreList = new HashSet<>(0);
+        System.out.println("writing permission data "  + pm.getPermissionInfo(Manifest.permission.WRITE_CONTACTS, PackageManager.GET_META_DATA).protectionLevel + ":" + PermissionInfo.PROTECTION_NORMAL + ":" + PermissionInfo.PROTECTION_NORMAL + ":" + PermissionInfo.PROTECTION_FLAG_PRIVILEGED);
+        if(packageInfo.requestedPermissions != null) {
+            appSpecificIgnoreList = Utils.makeHashSet(permissionsManagerSharedPreferences.getString(applicationInfo.packageName, ""), ";");
             for(String permission : packageInfo.requestedPermissions){
                 if(pm.checkPermission(permission, packageInfo.packageName) == PackageManager.PERMISSION_GRANTED){
                     grantedPermissions.add(permission);
-                    if(!allowedPermissions.containsKey(permission)) warnings ++;
+                    if(!ignoredPermissionsForAllApps.contains(permission) && !appSpecificIgnoreList.contains(permission))
+                        warnings ++;
                 }
             }
-
-        AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, grantedPermissions);
+        }
+        AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, grantedPermissions, appSpecificIgnoreList);
 
         androidApplication.setWarnings(warnings);
         return androidApplication;
@@ -91,19 +100,27 @@ public class ApplicationsDatabase {
         }
     }
 
-    public Map<String, ?> getAllowedPermissions(){
-        return context.getSharedPreferences(context.getString(R.string.allowed_permissions), Context.MODE_PRIVATE).getAll();
+    public HashSet<String> getIgnoredPermissionsForAllApps(){
+        String ignoredPermissionsForAllAppsString  = permissionsManagerSharedPreferences.getString(context.getString(R.string.allowed_permissions), "");
+        return Utils.makeHashSet(ignoredPermissionsForAllAppsString, ";");
     }
 
-    public void ignorePermission(String permission){
-        SharedPreferences allowedPermissionsPreferences = context.getSharedPreferences(context.getString(R.string.allowed_permissions), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = allowedPermissionsPreferences.edit();
-        editor.putBoolean(permission, true);
+    public void ignorePermissionForAllApps(String permission){
+        SharedPreferences.Editor editor = this.permissionsManagerSharedPreferences.edit();
+        ignoredPermissionsForAllApps.add(permission);
+        editor.putString(context.getString(R.string.allowed_permissions), Utils.makeString(ignoredPermissionsForAllApps, ";"));
         editor.commit();
         updateAllowedPermissions();
     }
 
+    public void ignorePermissionForSpecificApp(String packageName, String permission){
+        SharedPreferences.Editor editor = permissionsManagerSharedPreferences.edit();
+        String ignoredPermissionsForGivenApp = permissionsManagerSharedPreferences.getString(packageName, "");
+        editor.putString(packageName, ignoredPermissionsForGivenApp + ";" + permission);
+        editor.commit();
+    }
+
     private void updateAllowedPermissions() {
-        allowedPermissions = getAllowedPermissions();
+        ignoredPermissionsForAllApps = getIgnoredPermissionsForAllApps();
     }
 }

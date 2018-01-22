@@ -1,6 +1,7 @@
 package open.com.permissionsmanager;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by sultanm on 12/28/17.
@@ -12,11 +13,13 @@ public class AndroidApplication {
     private String name;
     private List<String> permissions;
     private int warnings;
+    private Set<String> exclusiveIgnoredPermissionsList;
 
-    public AndroidApplication(String applicationName, String packageName, List requestedPermissions) {
+    public AndroidApplication(String applicationName, String packageName, List requestedPermissions, Set<String> exclusiveIgnoredPermissionsList) {
         this.name  = applicationName;
         this.permissions = requestedPermissions;
         this.packageName = packageName;
+        this.exclusiveIgnoredPermissionsList = exclusiveIgnoredPermissionsList;
     }
 
     public String getPackageName() {
@@ -49,6 +52,10 @@ public class AndroidApplication {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<String> getExclusiveIgnoredPermissionsList() {
+        return exclusiveIgnoredPermissionsList;
     }
 
 }

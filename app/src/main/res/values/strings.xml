@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">PermissionsManager</string>
     <string name="allowed_permissions">allowedPermissions</string>
+    <string name="permissions_manager">permissions_manager</string>
+    <string name="ignore_for">Ignore for</string>
 </resources>
