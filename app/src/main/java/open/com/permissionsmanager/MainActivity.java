@@ -1,12 +1,14 @@
 package open.com.permissionsmanager;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import static android.view.View.GONE;
 import static open.com.permissionsmanager.ApplicationDetails.APPLICATION_INDEX;
 
 
@@ -38,15 +40,42 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(applicationsDatabase == null)
-            getApplicationsDatabase();
-        applicationsDatabase.updateApplicationsDatabase();
-        ApplicationsArrayAdapter adapter = (ApplicationsArrayAdapter) listOfApplications_listView.getAdapter();
-        if(adapter == null){
-            adapter = new ApplicationsArrayAdapter(this, R.layout.application_info_row);
-            listOfApplications_listView.setAdapter(adapter);
-        }
-        adapter.addAllApplications(applicationsDatabase.applications);
-        adapter.notifyDataSetChanged();
+        showSpinner();
+        updateApplicationsList();
+    }
+
+    private void showSpinner() {
+        findViewById(R.id.progressbar).setVisibility(View.VISIBLE);
+        findViewById(R.id.listOfApplications).setVisibility(GONE);
+    }
+
+    private void updateApplicationsList() {
+        new AsyncTask<Void, Void, Void>(){
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                if(applicationsDatabase == null)
+                    getApplicationsDatabase();
+                applicationsDatabase.updateApplicationsDatabase();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                ApplicationsArrayAdapter adapter = (ApplicationsArrayAdapter) listOfApplications_listView.getAdapter();
+                if(adapter == null){
+                    adapter = new ApplicationsArrayAdapter(MainActivity.this, R.layout.application_info_row);
+                    listOfApplications_listView.setAdapter(adapter);
+                }
+                adapter.addAllApplications(applicationsDatabase.applications);
+                adapter.notifyDataSetChanged();
+                hideSpinner();
+            }
+        }.execute();
+    }
+
+    private void hideSpinner() {
+        findViewById(R.id.progressbar).setVisibility(GONE);
+        findViewById(R.id.listOfApplications).setVisibility(View.VISIBLE);
     }
 }
