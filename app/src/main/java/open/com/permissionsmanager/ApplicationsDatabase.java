@@ -1,6 +1,5 @@
 package open.com.permissionsmanager;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -59,7 +58,7 @@ public class ApplicationsDatabase {
         Collections.sort(applications, new Comparator<AndroidApplication>() {
             @Override
             public int compare(AndroidApplication app1, AndroidApplication app2) {
-                return app2.getWarnings() - app1.getWarnings();
+                return app2.getWarnablePermissionIndexes().size() - app1.getWarnablePermissionIndexes().size();
             }
         });
     }
@@ -69,23 +68,25 @@ public class ApplicationsDatabase {
         PackageInfo packageInfo = null;
         packageInfo = pm.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS);
         List<String> grantedPermissions = new ArrayList<>();
-        int warnings = 0;
-        HashSet<String> appSpecificIgnoreList = new HashSet<>(0);
-        System.out.println("writing permission data "  + pm.getPermissionInfo(Manifest.permission.WRITE_CONTACTS, PackageManager.GET_META_DATA).protectionLevel + ":" + PermissionInfo.PROTECTION_NORMAL + ":" + PermissionInfo.PROTECTION_NORMAL + ":" + PermissionInfo.PROTECTION_FLAG_PRIVILEGED);
+        Set<Integer> warnablePermissionIndexes = new HashSet<>();
+        HashSet<String> appSpecificIgnoreList;
         if(packageInfo.requestedPermissions != null) {
             appSpecificIgnoreList = Utils.makeHashSet(permissionsManagerSharedPreferences.getString(applicationInfo.packageName, ""), ";");
-            for(String permission : packageInfo.requestedPermissions){
+            for(int i=0; i<packageInfo.requestedPermissions.length; i++){
+                String permission = packageInfo.requestedPermissions[i];
                 if(pm.checkPermission(permission, packageInfo.packageName) == PackageManager.PERMISSION_GRANTED){
                     grantedPermissions.add(permission);
-                    if(!ignoredPermissionsForAllApps.contains(permission) && !appSpecificIgnoreList.contains(permission))
-                        warnings ++;
+                    if(isDangerous(permission, pm) && !ignoredPermissionsForAllApps.contains(permission) && !appSpecificIgnoreList.contains(permission))
+                        warnablePermissionIndexes.add(i);
                 }
             }
         }
-        AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, grantedPermissions, appSpecificIgnoreList);
-
-        androidApplication.setWarnings(warnings);
+        AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, grantedPermissions, warnablePermissionIndexes);
         return androidApplication;
+    }
+
+    private boolean isDangerous(String permission, PackageManager pm) throws PackageManager.NameNotFoundException {
+        return pm.getPermissionInfo(permission, PackageManager.GET_META_DATA).protectionLevel == PermissionInfo.PROTECTION_DANGEROUS;
     }
 
     private String getApplicationName(PackageManager pm, ApplicationInfo applicationInfo) {
@@ -102,7 +103,7 @@ public class ApplicationsDatabase {
         PackageManager pm = context.getPackageManager();
         for(int i = 0, numberOfApplications = applications.size(); i < numberOfApplications; i++){
             AndroidApplication application = applications.get(i);
-            if(application.getWarnings() > 0)
+            if(application.getWarnablePermissionIndexes().size() > 0)
                 try {
                     applications.remove(i);
                     applications.add(i, createAndroidApplication(pm, pm.getApplicationInfo(application.getPackageName(), PackageManager.GET_META_DATA)));

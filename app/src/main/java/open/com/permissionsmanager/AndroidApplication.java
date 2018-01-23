@@ -12,14 +12,13 @@ public class AndroidApplication {
     private String packageName;
     private String name;
     private List<String> permissions;
-    private int warnings;
-    private Set<String> exclusiveIgnoredPermissionsList;
+    private Set<Integer> warnablePermissionIndexes;
 
-    public AndroidApplication(String applicationName, String packageName, List requestedPermissions, Set<String> exclusiveIgnoredPermissionsList) {
-        this.name  = applicationName;
-        this.permissions = requestedPermissions;
+    public AndroidApplication(String name, String packageName, List<String> permissions, Set<Integer> warnablePermissionIndexes) {
         this.packageName = packageName;
-        this.exclusiveIgnoredPermissionsList = exclusiveIgnoredPermissionsList;
+        this.name = name;
+        this.permissions = permissions;
+        this.warnablePermissionIndexes = warnablePermissionIndexes;
     }
 
     public String getPackageName() {
@@ -28,14 +27,6 @@ public class AndroidApplication {
 
     public void setPackageName(String packageName) {
         this.packageName = packageName;
-    }
-
-    public int getWarnings() {
-        return warnings;
-    }
-
-    public void setWarnings(int warnings) {
-        this.warnings = warnings;
     }
 
     public List<String> getPermissions() {
@@ -53,9 +44,11 @@ public class AndroidApplication {
     public void setName(String name) {
         this.name = name;
     }
-
-    public Set<String> getExclusiveIgnoredPermissionsList() {
-        return exclusiveIgnoredPermissionsList;
+    public Set<Integer> getWarnablePermissionIndexes() {
+        return warnablePermissionIndexes;
     }
 
+    public void setWarnablePermissionIndexes(Set<Integer> warnablePermissionIndexes) {
+        this.warnablePermissionIndexes = warnablePermissionIndexes;
+    }
 }

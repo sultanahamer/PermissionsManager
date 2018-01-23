@@ -22,7 +22,6 @@ public class ApplicationDetails extends AppCompatActivity {
     LayoutInflater layoutInflater;
     ApplicationsDatabase applicationsDatabase;
     public static final String APPLICATION_INDEX = "APPLICATION_INDEX";
-    Set<String> exclusivePermissionsIgnoreList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +34,6 @@ public class ApplicationDetails extends AppCompatActivity {
             finish();
         applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(ApplicationDetails.this);
         application = ApplicationsDatabase.getApplicationsDatabase(this).applications.get(applicationIndex);
-        exclusivePermissionsIgnoreList = application.getExclusiveIgnoredPermissionsList();
         addApplicationDetails();
         ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
         permissionsList_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -61,7 +59,7 @@ public class ApplicationDetails extends AppCompatActivity {
     }
 
     private void addApplicationDetails() {
-        final ApplicationsDatabase applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(ApplicationDetails.this);
+        final Set<Integer> warnablePermissionIndexes = application.getWarnablePermissionIndexes();
         setTitle(application.getName());
         ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
         ArrayAdapter arrayAdapter = new ArrayAdapter<String>(this, R.layout.application_info_row){
@@ -73,7 +71,7 @@ public class ApplicationDetails extends AppCompatActivity {
                     reusableView = layoutInflater.inflate(R.layout.application_info_row, parent, false);
                 TextView permission_textView = (TextView) reusableView.findViewById(R.id.title);
                 ImageView warningImage = (ImageView) reusableView.findViewById(R.id.warning_image);
-                if(!applicationsDatabase.ignoredPermissionsForAllApps.contains(permission) && !exclusivePermissionsIgnoreList.contains(permission))
+                if(warnablePermissionIndexes.contains(position))
                     warningImage.setVisibility(View.VISIBLE);
                 else
                     warningImage.setVisibility(View.INVISIBLE);

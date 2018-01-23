@@ -30,7 +30,7 @@ public class ApplicationsArrayAdapter extends ArrayAdapter<AndroidApplication> {
         TextView applicationName = (TextView) reusableView.findViewById(R.id.title);
         applicationName.setText(androidApplication.getName());
         TextView warningCount = (TextView) reusableView.findViewById(R.id.warning_count_text);
-        warningCount.setText(String.valueOf(androidApplication.getWarnings()));
+        warningCount.setText(String.valueOf(androidApplication.getWarnablePermissionIndexes().size()));
         return reusableView;
     }
 
