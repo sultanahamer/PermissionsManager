@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.Set;
+import java.util.List;
 
 public class ApplicationDetails extends AppCompatActivity {
     AndroidApplication application;
@@ -35,7 +35,7 @@ public class ApplicationDetails extends AppCompatActivity {
         applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(ApplicationDetails.this);
         application = ApplicationsDatabase.getApplicationsDatabase(this).applications.get(applicationIndex);
         addApplicationDetails();
-        ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
+        final ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
         permissionsList_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -45,10 +45,10 @@ public class ApplicationDetails extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 switch(which){
                                     case 0:
-                                        applicationsDatabase.ignorePermissionForAllApps(application.getPermissions().get(position));
+                                        applicationsDatabase.ignorePermissionForAllApps((String) permissionsList_listView.getAdapter().getItem(position));
                                         break;
                                     case 1:
-                                        applicationsDatabase.ignorePermissionForSpecificApp(application.getPackageName(), application.getPermissions().get(position));
+                                        applicationsDatabase.ignorePermissionForSpecificApp(application.getPackageName(), (String) permissionsList_listView.getAdapter().getItem(position));
                                         break;
                                 }
                             }
@@ -59,7 +59,7 @@ public class ApplicationDetails extends AppCompatActivity {
     }
 
     private void addApplicationDetails() {
-        final Set<Integer> warnablePermissionIndexes = application.getWarnablePermissionIndexes();
+        final List<String> warnablePermissions = application.getWarnablePermissions();
         setTitle(application.getName());
         ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
         ArrayAdapter arrayAdapter = new ArrayAdapter<String>(this, R.layout.application_info_row){
@@ -71,7 +71,7 @@ public class ApplicationDetails extends AppCompatActivity {
                     reusableView = layoutInflater.inflate(R.layout.application_info_row, parent, false);
                 TextView permission_textView = (TextView) reusableView.findViewById(R.id.title);
                 ImageView warningImage = (ImageView) reusableView.findViewById(R.id.warning_image);
-                if(warnablePermissionIndexes.contains(position))
+                if(warnablePermissions.contains(permission))
                     warningImage.setVisibility(View.VISIBLE);
                 else
                     warningImage.setVisibility(View.INVISIBLE);
@@ -79,7 +79,9 @@ public class ApplicationDetails extends AppCompatActivity {
                 return reusableView;
             }
         };
-        for(String permission : application.getPermissions())
+        for(String permission : application.getWarnablePermissions())
+            arrayAdapter.add(permission);
+        for(String permission : application.getNonwarnablePermissions())
             arrayAdapter.add(permission);
         permissionsList_listView.setAdapter(arrayAdapter);
     }

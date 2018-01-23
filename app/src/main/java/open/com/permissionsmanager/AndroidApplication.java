@@ -1,7 +1,6 @@
 package open.com.permissionsmanager;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by sultanm on 12/28/17.
@@ -11,15 +10,15 @@ public class AndroidApplication {
 
     private String packageName;
     private String name;
-    private List<String> permissions;
-    private Set<Integer> warnablePermissionIndexes;
+    private List<String> nonwarnablePermissions;
+    private List<String> warnablePermissions;
     private boolean enabled;
 
-    public AndroidApplication(String name, String packageName, List<String> permissions, Set<Integer> warnablePermissionIndexes, boolean enabled) {
+    public AndroidApplication(String name, String packageName, List<String> nonwarnablePermissions, List<String> warnablePermissions, boolean enabled) {
         this.packageName = packageName;
         this.name = name;
-        this.permissions = permissions;
-        this.warnablePermissionIndexes = warnablePermissionIndexes;
+        this.nonwarnablePermissions = nonwarnablePermissions;
+        this.warnablePermissions = warnablePermissions;
         this.enabled = enabled;
     }
 
@@ -31,12 +30,12 @@ public class AndroidApplication {
         this.packageName = packageName;
     }
 
-    public List<String> getPermissions() {
-        return permissions;
+    public List<String> getNonwarnablePermissions() {
+        return nonwarnablePermissions;
     }
 
-    public void setPermissions(List permissions) {
-        this.permissions = permissions;
+    public void setNonwarnablePermissions(List<String> nonwarnablePermissions) {
+        this.nonwarnablePermissions = nonwarnablePermissions;
     }
 
     public String getName() {
@@ -46,12 +45,12 @@ public class AndroidApplication {
     public void setName(String name) {
         this.name = name;
     }
-    public Set<Integer> getWarnablePermissionIndexes() {
-        return warnablePermissionIndexes;
+    public List<String> getWarnablePermissions() {
+        return warnablePermissions;
     }
 
-    public void setWarnablePermissionIndexes(Set<Integer> warnablePermissionIndexes) {
-        this.warnablePermissionIndexes = warnablePermissionIndexes;
+    public void setWarnablePermissions(List<String> warnablePermissions) {
+        this.warnablePermissions = warnablePermissions;
     }
 
     public boolean isEnabled() {

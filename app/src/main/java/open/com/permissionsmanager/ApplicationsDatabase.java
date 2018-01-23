@@ -58,7 +58,7 @@ public class ApplicationsDatabase {
         Collections.sort(applications, new Comparator<AndroidApplication>() {
             @Override
             public int compare(AndroidApplication app1, AndroidApplication app2) {
-                int usualCompareResult = app2.getWarnablePermissionIndexes().size() - app1.getWarnablePermissionIndexes().size();
+                int usualCompareResult = app2.getWarnablePermissions().size() - app1.getWarnablePermissions().size();
                 boolean app1Enabled = app1.isEnabled();
                 boolean app2Enabled = app2.isEnabled();
                 if(app1Enabled == app2Enabled)
@@ -72,21 +72,22 @@ public class ApplicationsDatabase {
     private AndroidApplication createAndroidApplication(PackageManager pm, ApplicationInfo applicationInfo) throws PackageManager.NameNotFoundException {
         PackageInfo packageInfo = null;
         packageInfo = pm.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS);
-        List<String> grantedPermissions = new ArrayList<>();
-        Set<Integer> warnablePermissionIndexes = new HashSet<>();
+        List<String> nonwarnablePermission = new ArrayList<>();
+        List<String> warnablePermissions = new ArrayList<>(3);
         HashSet<String> appSpecificIgnoreList;
         if(packageInfo.requestedPermissions != null) {
             appSpecificIgnoreList = Utils.makeHashSet(permissionsManagerSharedPreferences.getString(applicationInfo.packageName, ""), ";");
             for(int i=0; i<packageInfo.requestedPermissions.length; i++){
                 String permission = packageInfo.requestedPermissions[i];
                 if(pm.checkPermission(permission, packageInfo.packageName) == PackageManager.PERMISSION_GRANTED){
-                    grantedPermissions.add(permission);
                     if(isDangerous(permission, pm) && !ignoredPermissionsForAllApps.contains(permission) && !appSpecificIgnoreList.contains(permission))
-                        warnablePermissionIndexes.add(i);
+                        warnablePermissions.add(permission);
+                    else
+                        nonwarnablePermission.add(permission);
                 }
             }
         }
-        AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, grantedPermissions, warnablePermissionIndexes, applicationInfo.enabled);
+        AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, nonwarnablePermission, warnablePermissions, applicationInfo.enabled);
         return androidApplication;
     }
 
@@ -108,7 +109,7 @@ public class ApplicationsDatabase {
         PackageManager pm = context.getPackageManager();
         for(int i = 0, numberOfApplications = applications.size(); i < numberOfApplications; i++){
             AndroidApplication application = applications.get(i);
-            if(application.getWarnablePermissionIndexes().size() > 0)
+            if(application.getWarnablePermissions().size() > 0)
                 try {
                     applications.remove(i);
                     applications.add(i, createAndroidApplication(pm, pm.getApplicationInfo(application.getPackageName(), PackageManager.GET_META_DATA)));
