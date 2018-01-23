@@ -40,8 +40,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         if(applicationsDatabase == null)
             getApplicationsDatabase();
-        else
-            applicationsDatabase.updateApplicationsDatabase();
+        applicationsDatabase.updateApplicationsDatabase();
         ApplicationsArrayAdapter adapter = (ApplicationsArrayAdapter) listOfApplications_listView.getAdapter();
         if(adapter == null){
             adapter = new ApplicationsArrayAdapter(this, R.layout.application_info_row);

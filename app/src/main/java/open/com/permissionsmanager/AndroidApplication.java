@@ -13,12 +13,14 @@ public class AndroidApplication {
     private String name;
     private List<String> permissions;
     private Set<Integer> warnablePermissionIndexes;
+    private boolean enabled;
 
-    public AndroidApplication(String name, String packageName, List<String> permissions, Set<Integer> warnablePermissionIndexes) {
+    public AndroidApplication(String name, String packageName, List<String> permissions, Set<Integer> warnablePermissionIndexes, boolean enabled) {
         this.packageName = packageName;
         this.name = name;
         this.permissions = permissions;
         this.warnablePermissionIndexes = warnablePermissionIndexes;
+        this.enabled = enabled;
     }
 
     public String getPackageName() {
@@ -50,5 +52,13 @@ public class AndroidApplication {
 
     public void setWarnablePermissionIndexes(Set<Integer> warnablePermissionIndexes) {
         this.warnablePermissionIndexes = warnablePermissionIndexes;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

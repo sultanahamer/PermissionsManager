@@ -58,7 +58,12 @@ public class ApplicationsDatabase {
         Collections.sort(applications, new Comparator<AndroidApplication>() {
             @Override
             public int compare(AndroidApplication app1, AndroidApplication app2) {
-                return app2.getWarnablePermissionIndexes().size() - app1.getWarnablePermissionIndexes().size();
+                int usualCompareResult = app2.getWarnablePermissionIndexes().size() - app1.getWarnablePermissionIndexes().size();
+                boolean app1Enabled = app1.isEnabled();
+                boolean app2Enabled = app2.isEnabled();
+                if(app1Enabled == app2Enabled)
+                    return usualCompareResult;
+                return app1Enabled ? -1 : 1;
             }
         });
     }
@@ -81,7 +86,7 @@ public class ApplicationsDatabase {
                 }
             }
         }
-        AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, grantedPermissions, warnablePermissionIndexes);
+        AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, grantedPermissions, warnablePermissionIndexes, applicationInfo.enabled);
         return androidApplication;
     }
 
