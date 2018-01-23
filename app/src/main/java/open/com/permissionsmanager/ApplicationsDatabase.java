@@ -134,8 +134,10 @@ public class ApplicationsDatabase {
 
     public void ignorePermissionForSpecificApp(String packageName, String permission){
         SharedPreferences.Editor editor = permissionsManagerSharedPreferences.edit();
-        String ignoredPermissionsForGivenApp = permissionsManagerSharedPreferences.getString(packageName, "");
-        editor.putString(packageName, ignoredPermissionsForGivenApp + ";" + permission);
+        String ignoredPermissionsForGivenAppAsString = permissionsManagerSharedPreferences.getString(packageName, "");
+        HashSet<String> ignoredPermissionsForSpecificApp = Utils.makeHashSet(ignoredPermissionsForGivenAppAsString, ";");
+        ignoredPermissionsForSpecificApp.add(permission);
+        editor.putString(packageName, Utils.makeString(ignoredPermissionsForSpecificApp, ";"));
         editor.commit();
     }
 
