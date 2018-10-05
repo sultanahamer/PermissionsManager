@@ -76,9 +76,8 @@ public class ApplicationsDatabase {
         List<String> warnablePermissions = new ArrayList<>(3);
         HashSet<String> appSpecificIgnoreList;
         if(packageInfo.requestedPermissions != null) {
-            appSpecificIgnoreList = Utils.makeHashSet(permissionsManagerSharedPreferences.getString(applicationInfo.packageName, ""), ";");
-            for(int i=0; i<packageInfo.requestedPermissions.length; i++){
-                String permission = packageInfo.requestedPermissions[i];
+            appSpecificIgnoreList = getAppSpecificIgnoreList(applicationInfo);
+            for(String permission : packageInfo.requestedPermissions){
                 if(pm.checkPermission(permission, packageInfo.packageName) == PackageManager.PERMISSION_GRANTED){
                     if(isDangerous(permission, pm) && !ignoredPermissionsForAllApps.contains(permission) && !appSpecificIgnoreList.contains(permission))
                         warnablePermissions.add(permission);
@@ -89,6 +88,11 @@ public class ApplicationsDatabase {
         }
         AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, nonwarnablePermission, warnablePermissions, applicationInfo.enabled);
         return androidApplication;
+    }
+
+    @NonNull
+    private HashSet<String> getAppSpecificIgnoreList(ApplicationInfo applicationInfo) {
+        return Utils.makeHashSet(permissionsManagerSharedPreferences.getString(applicationInfo.packageName, ""), ";");
     }
 
     private boolean isDangerous(String permission, PackageManager pm) throws PackageManager.NameNotFoundException {
