@@ -33,7 +33,7 @@ public class ApplicationDetails extends AppCompatActivity {
         if(applicationIndex == -1)
             finish();
         applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(ApplicationDetails.this);
-        application = ApplicationsDatabase.getApplicationsDatabase(this).applications.get(applicationIndex);
+        application = ApplicationsDatabase.getApplicationsDatabase(this).getACopyOfApplications().get(applicationIndex);
         addApplicationDetails();
         final ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
         permissionsList_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

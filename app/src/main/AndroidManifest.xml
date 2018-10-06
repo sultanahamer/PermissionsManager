@@ -16,12 +16,15 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".PermissionValidationService"
-            android:enabled="true"
-            android:exported="true" />
+        <receiver android:name=".BootBroadcastReciever">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
 
-        <activity android:name=".ApplicationDetails"></activity>
+        </receiver>
+        <receiver android:name=".ValidatePermissionsBroadcastReceiver" />
+
+        <activity android:name=".ApplicationDetails" />
     </application>
-
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 </manifest>

@@ -1,6 +1,7 @@
 package open.com.permissionsmanager;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,9 +20,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setAlarmIfNotSet();
         setContentView(R.layout.activity_main);
-//        Intent serviceStartIntent = new Intent(getApplicationContext(), PermissionValidationService.class);
-//        startService(serviceStartIntent);
         listOfApplications_listView = (ListView) findViewById(R.id.listOfApplications);
         listOfApplications_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -31,6 +31,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intentToShowApplicationDetails);
             }
         });
+    }
+
+    private void setAlarmIfNotSet() {
+        SharedPreferences sharedPreferences = Utils.getSharedPreferences(this);
+        String alarm_set_key = getString(R.string.alarm_set);
+        if(!sharedPreferences.contains(alarm_set_key)){
+            Utils.setAlarm(this);
+            sharedPreferences.edit().putBoolean(alarm_set_key, true).apply();
+        }
     }
 
     private void getApplicationsDatabase() {
@@ -67,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                     adapter = new ApplicationsArrayAdapter(MainActivity.this, R.layout.application_info_row);
                     listOfApplications_listView.setAdapter(adapter);
                 }
-                adapter.addAllApplications(applicationsDatabase.applications);
+                adapter.addAllApplications(applicationsDatabase.getACopyOfApplications());
                 adapter.notifyDataSetChanged();
                 hideSpinner();
             }

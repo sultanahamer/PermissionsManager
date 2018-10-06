@@ -20,41 +20,59 @@ import java.util.Set;
  */
 
 public class ApplicationsDatabase {
-    List<AndroidApplication> applications = new ArrayList<>();
+    public static final int TASK_REPLACE = 2;
+    private List<AndroidApplication> applications = new ArrayList<>();
     private Context context;
     SharedPreferences permissionsManagerSharedPreferences;
     Set<String> ignoredPermissionsForAllApps;
     private static ApplicationsDatabase applicationsDatabase;
+    private final static int TASK_RETURN_A_COPY = 1;
+
     private ApplicationsDatabase(Context context){
         this.context = context;
-        permissionsManagerSharedPreferences = context.getSharedPreferences(context.getString(R.string.permissions_manager), Context.MODE_PRIVATE);
+        permissionsManagerSharedPreferences = Utils.getSharedPreferences(context);
         String ignoredPermissionsForAllAppsString = permissionsManagerSharedPreferences.getString(context.getString(R.string.allowed_permissions), new String());
         ignoredPermissionsForAllApps = Utils.makeHashSet(ignoredPermissionsForAllAppsString, ";");
         updateApplicationsDatabase();
     }
-    static ApplicationsDatabase getApplicationsDatabase(Context context){
+    public synchronized static ApplicationsDatabase getApplicationsDatabase(Context context){
         if(applicationsDatabase == null)
             applicationsDatabase = new ApplicationsDatabase(context);
         return applicationsDatabase;
     }
 
+    private synchronized List<AndroidApplication> performSynchronizedTask(int task, List<AndroidApplication> newApplicationsList){
+        switch (task){
+            case TASK_RETURN_A_COPY:
+                return new ArrayList<>(applications);
+            case TASK_REPLACE:
+                return applications = newApplicationsList;
+        }
+        throw new RuntimeException("No task with id " + task + " found");
+    }
+
+    public List<AndroidApplication> getACopyOfApplications(){
+        return performSynchronizedTask(TASK_RETURN_A_COPY, null);
+    }
+
     public void updateApplicationsDatabase() {
-        applications.clear();
+        ArrayList<AndroidApplication> newApplicationsList = new ArrayList<>();
         PackageManager pm = context.getPackageManager();
+        AndroidApplication androidApplication;
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         for (ApplicationInfo applicationInfo : packages) {
-            AndroidApplication androidApplication = null;
             try {
                 androidApplication = createAndroidApplication(pm, applicationInfo);
-                applications.add(androidApplication);
+                newApplicationsList.add(androidApplication);
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
         }
-        sort();
+        sort(newApplicationsList);
+        performSynchronizedTask(TASK_REPLACE, newApplicationsList);
     }
 
-    private void sort() {
+    private void sort(List<AndroidApplication> applications) {
         Collections.sort(applications, new Comparator<AndroidApplication>() {
             @Override
             public int compare(AndroidApplication app1, AndroidApplication app2) {
@@ -70,7 +88,7 @@ public class ApplicationsDatabase {
 
     @NonNull
     private AndroidApplication createAndroidApplication(PackageManager pm, ApplicationInfo applicationInfo) throws PackageManager.NameNotFoundException {
-        PackageInfo packageInfo = null;
+        PackageInfo packageInfo;
         packageInfo = pm.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS);
         List<String> nonwarnablePermission = new ArrayList<>();
         List<String> warnablePermissions = new ArrayList<>(3);
@@ -86,8 +104,7 @@ public class ApplicationsDatabase {
                 }
             }
         }
-        AndroidApplication androidApplication = new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, nonwarnablePermission, warnablePermissions, applicationInfo.enabled);
-        return androidApplication;
+        return new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, nonwarnablePermission, warnablePermissions, applicationInfo.enabled);
     }
 
     @NonNull
@@ -104,24 +121,24 @@ public class ApplicationsDatabase {
             return pm.getApplicationLabel(applicationInfo).toString();
         }
         catch (Exception e){
-            System.out.println("in exception, return name: "+ applicationInfo.packageName);
+            System.out.println("This application has no name hence using its package name"+ applicationInfo.packageName);
             return applicationInfo.packageName;
         }
     }
 
-    public void recomputePermissions(){
-        PackageManager pm = context.getPackageManager();
-        for(int i = 0, numberOfApplications = applications.size(); i < numberOfApplications; i++){
-            AndroidApplication application = applications.get(i);
-            if(application.getWarnablePermissions().size() > 0)
-                try {
-                    applications.remove(i);
-                    applications.add(i, createAndroidApplication(pm, pm.getApplicationInfo(application.getPackageName(), PackageManager.GET_META_DATA)));
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                }
-        }
-    }
+//    public void recomputePermissions(){TODO: this would get used later
+//        PackageManager pm = context.getPackageManager();
+//        for(int i = 0, numberOfApplications = applications.size(); i < numberOfApplications; i++){
+//            AndroidApplication application = applications.get(i);
+//            if(application.getWarnablePermissions().size() > 0)
+//                try {
+//                    applications.remove(i);
+//                    applications.add(i, createAndroidApplication(pm, pm.getApplicationInfo(application.getPackageName(), PackageManager.GET_META_DATA)));
+//                } catch (PackageManager.NameNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//        }
+//    }
 
     public HashSet<String> getIgnoredPermissionsForAllApps(){
         String ignoredPermissionsForAllAppsString  = permissionsManagerSharedPreferences.getString(context.getString(R.string.allowed_permissions), "");
