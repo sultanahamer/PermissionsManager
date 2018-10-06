@@ -27,12 +27,14 @@ public class ApplicationsDatabase {
     private Set<String> ignoredPermissionsForAllApps;
     private static ApplicationsDatabase applicationsDatabase;
     private final static int TASK_RETURN_A_COPY = 1;
+    private List<ApplicationDatabaseChangeListener> applicationDatabaseChangeListeners;
 
     private ApplicationsDatabase(Context context){
         this.context = context;
         permissionsManagerSharedPreferences = Utils.getSharedPreferences(context);
         String ignoredPermissionsForAllAppsString = permissionsManagerSharedPreferences.getString(context.getString(R.string.allowed_permissions), new String());
         ignoredPermissionsForAllApps = Utils.makeHashSet(ignoredPermissionsForAllAppsString, ";");
+        applicationDatabaseChangeListeners = new ArrayList<>(3);
         updateApplicationsDatabase();
     }
     public synchronized static ApplicationsDatabase getApplicationsDatabase(Context context){
@@ -74,6 +76,8 @@ public class ApplicationsDatabase {
         }
         sort(newApplicationsList);
         performSynchronizedTask(TASK_REPLACE, newApplicationsList);
+        for(ApplicationDatabaseChangeListener applicationDatabaseChangeListener : applicationDatabaseChangeListeners)
+            applicationDatabaseChangeListener.applicationsDatabaseUpdated(applications);
     }
 
     private void sort(List<AndroidApplication> applications) {
@@ -150,18 +154,44 @@ public class ApplicationsDatabase {
         editor.putString(context.getString(R.string.allowed_permissions), Utils.makeString(ignoredPermissionsForAllApps, ";"));
         editor.commit();
         updateAllowedPermissions();
+        new Thread(){
+            @Override
+            public void run() {
+                updateApplicationsDatabase();
+            }
+        }.start();
     }
 
     public void ignorePermissionForSpecificApp(String packageName, String permission){
+        int indexOfApp = applications.indexOf(new AndroidApplication(packageName));
+        if(indexOfApp == -1)
+            return;
+        AndroidApplication application = applications.get(indexOfApp);
+        List<String> warnablePermissions = application.getWarnablePermissions();
+        if(!warnablePermissions.contains(permission))
+            return;
+        warnablePermissions.remove(permission);
+        application.getNonwarnablePermissions().add(permission);
+
         SharedPreferences.Editor editor = permissionsManagerSharedPreferences.edit();
         String ignoredPermissionsForGivenAppAsString = permissionsManagerSharedPreferences.getString(packageName, "");
         HashSet<String> ignoredPermissionsForSpecificApp = Utils.makeHashSet(ignoredPermissionsForGivenAppAsString, ";");
         ignoredPermissionsForSpecificApp.add(permission);
         editor.putString(packageName, Utils.makeString(ignoredPermissionsForSpecificApp, ";"));
         editor.commit();
+
+        for(ApplicationDatabaseChangeListener applicationDatabaseChangeListener : applicationDatabaseChangeListeners)
+            applicationDatabaseChangeListener.applicationPermissionsUpdated(application);
     }
 
     private void updateAllowedPermissions() {
         ignoredPermissionsForAllApps = getIgnoredPermissionsForAllApps();
+    }
+
+    public void addApplicationDatabaseChangeListener(ApplicationDatabaseChangeListener applicationDatabaseChangeListener){
+        applicationDatabaseChangeListeners.add(applicationDatabaseChangeListener);
+    }
+    public void removeApplicationDatabaseChangeListener(ApplicationDatabaseChangeListener applicationDatabaseChangeListener){
+        applicationDatabaseChangeListeners.remove(applicationDatabaseChangeListener);
     }
 }

@@ -41,7 +41,7 @@ public class ApplicationDetails extends AppCompatActivity {
         final int numberOfWarnablePermissions = warnablePermissions.size();
         permissionsList_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+            public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
 
                 if(position >= numberOfWarnablePermissions)
                     return;
@@ -52,9 +52,11 @@ public class ApplicationDetails extends AppCompatActivity {
                                 switch(which){
                                     case 0:
                                         applicationsDatabase.ignorePermissionForAllApps(warnablePermissions.get(position));
+                                        view.findViewById(R.id.warning_image).setVisibility(View.GONE);
                                         break;
                                     case 1:
                                         applicationsDatabase.ignorePermissionForSpecificApp(application.getPackageName(), warnablePermissions.get(position));
+                                        view.findViewById(R.id.warning_image).setVisibility(View.GONE);
                                         break;
                                 }
                             }

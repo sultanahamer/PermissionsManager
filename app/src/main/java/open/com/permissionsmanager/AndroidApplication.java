@@ -13,6 +13,10 @@ public class AndroidApplication {
     private List<String> nonwarnablePermissions;
     private List<String> warnablePermissions;
 
+    public AndroidApplication(String packageName){
+        this.packageName = packageName;
+    }
+
     public AndroidApplication(String name, String packageName, List<String> nonwarnablePermissions, List<String> warnablePermissions) {
         this.packageName = packageName;
         this.name = name;
@@ -51,4 +55,13 @@ public class AndroidApplication {
         this.warnablePermissions = warnablePermissions;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AndroidApplication that = (AndroidApplication) o;
+
+        return packageName.equals(that.packageName);
+    }
 }

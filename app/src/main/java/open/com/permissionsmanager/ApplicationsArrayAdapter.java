@@ -39,4 +39,9 @@ public class ApplicationsArrayAdapter extends ArrayAdapter<AndroidApplication> {
         for(AndroidApplication application : applications)
             add(application);
     }
+
+    public void replaceItemAt(int indexOfApplication, AndroidApplication androidApplication) {
+        remove(androidApplication);
+        insert(androidApplication, indexOfApplication);
+    }
 }
