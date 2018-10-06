@@ -61,6 +61,8 @@ public class ApplicationsDatabase {
         AndroidApplication androidApplication;
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         for (ApplicationInfo applicationInfo : packages) {
+            if(!applicationInfo.enabled)
+                continue;
             try {
                 androidApplication = createAndroidApplication(pm, applicationInfo);
                 newApplicationsList.add(androidApplication);
@@ -76,12 +78,7 @@ public class ApplicationsDatabase {
         Collections.sort(applications, new Comparator<AndroidApplication>() {
             @Override
             public int compare(AndroidApplication app1, AndroidApplication app2) {
-                int usualCompareResult = app2.getWarnablePermissions().size() - app1.getWarnablePermissions().size();
-                boolean app1Enabled = app1.isEnabled();
-                boolean app2Enabled = app2.isEnabled();
-                if(app1Enabled == app2Enabled)
-                    return usualCompareResult;
-                return app1Enabled ? -1 : 1;
+            return app2.getWarnablePermissions().size() - app1.getWarnablePermissions().size();
             }
         });
     }
@@ -104,7 +101,7 @@ public class ApplicationsDatabase {
                 }
             }
         }
-        return new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, nonwarnablePermission, warnablePermissions, applicationInfo.enabled);
+        return new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, nonwarnablePermission, warnablePermissions);
     }
 
     @NonNull

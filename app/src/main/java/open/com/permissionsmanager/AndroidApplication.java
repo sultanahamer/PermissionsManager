@@ -12,14 +12,12 @@ public class AndroidApplication {
     private String name;
     private List<String> nonwarnablePermissions;
     private List<String> warnablePermissions;
-    private boolean enabled;
 
-    public AndroidApplication(String name, String packageName, List<String> nonwarnablePermissions, List<String> warnablePermissions, boolean enabled) {
+    public AndroidApplication(String name, String packageName, List<String> nonwarnablePermissions, List<String> warnablePermissions) {
         this.packageName = packageName;
         this.name = name;
         this.nonwarnablePermissions = nonwarnablePermissions;
         this.warnablePermissions = warnablePermissions;
-        this.enabled = enabled;
     }
 
     public String getPackageName() {
@@ -53,11 +51,4 @@ public class AndroidApplication {
         this.warnablePermissions = warnablePermissions;
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
 }
