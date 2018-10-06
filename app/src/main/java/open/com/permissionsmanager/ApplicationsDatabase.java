@@ -20,11 +20,11 @@ import java.util.Set;
  */
 
 public class ApplicationsDatabase {
-    public static final int TASK_REPLACE = 2;
+    private static final int TASK_REPLACE = 2;
     private List<AndroidApplication> applications = new ArrayList<>();
     private Context context;
-    SharedPreferences permissionsManagerSharedPreferences;
-    Set<String> ignoredPermissionsForAllApps;
+    private SharedPreferences permissionsManagerSharedPreferences;
+    private Set<String> ignoredPermissionsForAllApps;
     private static ApplicationsDatabase applicationsDatabase;
     private final static int TASK_RETURN_A_COPY = 1;
 

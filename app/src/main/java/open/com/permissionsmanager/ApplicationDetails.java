@@ -18,9 +18,9 @@ import android.widget.TextView;
 import java.util.List;
 
 public class ApplicationDetails extends AppCompatActivity {
-    AndroidApplication application;
-    LayoutInflater layoutInflater;
-    ApplicationsDatabase applicationsDatabase;
+    private AndroidApplication application;
+    private LayoutInflater layoutInflater;
+    private ApplicationsDatabase applicationsDatabase;
     public static final String APPLICATION_INDEX = "APPLICATION_INDEX";
 
     @Override

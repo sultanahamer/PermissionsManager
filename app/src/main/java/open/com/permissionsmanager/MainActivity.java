@@ -14,8 +14,8 @@ import static open.com.permissionsmanager.ApplicationDetails.APPLICATION_INDEX;
 
 
 public class MainActivity extends AppCompatActivity {
-    ApplicationsDatabase applicationsDatabase;
-    ListView listOfApplications_listView;
+    private ApplicationsDatabase applicationsDatabase;
+    private ListView listOfApplications_listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
