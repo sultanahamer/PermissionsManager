@@ -65,6 +65,8 @@ public class ApplicationsDatabase {
                 continue;
             try {
                 androidApplication = createAndroidApplication(pm, applicationInfo);
+                if(androidApplication.getWarnablePermissions().size() == 0)
+                    continue;
                 newApplicationsList.add(androidApplication);
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();

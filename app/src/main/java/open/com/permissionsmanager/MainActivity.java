@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 adapter.addAllApplications(applicationsDatabase.getACopyOfApplications());
                 adapter.notifyDataSetChanged();
+                getSupportActionBar().setSubtitle(getString(R.string.apps_with_warnings_count) + adapter.getCount());
                 hideSpinner();
             }
         }.execute();

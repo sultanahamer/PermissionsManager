@@ -4,4 +4,5 @@
     <string name="permissions_manager">permissions_manager</string>
     <string name="ignore_for">Ignore for</string>
     <string name="alarm_set">ALARM_SET</string>
+    <string name="apps_with_warnings_count">Apps with warnings:</string>
 </resources>
