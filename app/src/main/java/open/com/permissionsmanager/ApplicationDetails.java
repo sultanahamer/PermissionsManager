@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ApplicationDetails extends AppCompatActivity {
@@ -36,19 +37,24 @@ public class ApplicationDetails extends AppCompatActivity {
         application = ApplicationsDatabase.getApplicationsDatabase(this).getACopyOfApplications().get(applicationIndex);
         addApplicationDetails();
         final ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
+        final List<String> warnablePermissions = application.getWarnablePermissions();
+        final int numberOfWarnablePermissions = warnablePermissions.size();
         permissionsList_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                if(position >= numberOfWarnablePermissions)
+                    return;
                 AlertDialog.Builder builder = new AlertDialog.Builder(ApplicationDetails.this);
                 builder.setTitle(R.string.ignore_for)
                         .setItems(new String[]{"All apps", "This app", "Cancel"}, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 switch(which){
                                     case 0:
-                                        applicationsDatabase.ignorePermissionForAllApps((String) permissionsList_listView.getAdapter().getItem(position));
+                                        applicationsDatabase.ignorePermissionForAllApps(warnablePermissions.get(position));
                                         break;
                                     case 1:
-                                        applicationsDatabase.ignorePermissionForSpecificApp(application.getPackageName(), (String) permissionsList_listView.getAdapter().getItem(position));
+                                        applicationsDatabase.ignorePermissionForSpecificApp(application.getPackageName(), warnablePermissions.get(position));
                                         break;
                                 }
                             }
@@ -59,10 +65,10 @@ public class ApplicationDetails extends AppCompatActivity {
     }
 
     private void addApplicationDetails() {
-        final List<String> warnablePermissions = application.getWarnablePermissions();
+        final List<String> warnablePermissions = getNameSpaceTruncatedPermissions(application.getWarnablePermissions());
         setTitle(application.getName());
         ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
-        ArrayAdapter arrayAdapter = new ArrayAdapter<String>(this, R.layout.application_info_row){
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.application_info_row){
             @NonNull
             @Override
             public View getView(int position, View reusableView, ViewGroup parent) {
@@ -79,10 +85,18 @@ public class ApplicationDetails extends AppCompatActivity {
                 return reusableView;
             }
         };
-        for(String permission : application.getWarnablePermissions())
+        for(String permission : warnablePermissions)
             arrayAdapter.add(permission);
-        for(String permission : application.getNonwarnablePermissions())
+        for(String permission : getNameSpaceTruncatedPermissions(application.getNonwarnablePermissions()))
             arrayAdapter.add(permission);
         permissionsList_listView.setAdapter(arrayAdapter);
+    }
+
+    private List<String> getNameSpaceTruncatedPermissions(List<String> permissions) {
+        List<String> truncatedPermissions = new ArrayList<>(permissions.size());
+        for(String permission : permissions){
+            truncatedPermissions.add(permission.replace("android.permission.", ""));
+        }
+        return truncatedPermissions;
     }
 }
