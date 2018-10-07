@@ -74,19 +74,10 @@ public class ApplicationsDatabase {
                 e.printStackTrace();
             }
         }
-        sort(newApplicationsList);
         performSynchronizedTask(TASK_REPLACE, newApplicationsList);
-        for(ApplicationDatabaseChangeListener applicationDatabaseChangeListener : applicationDatabaseChangeListeners)
-            applicationDatabaseChangeListener.applicationsDatabaseUpdated(applications);
-    }
 
-    private void sort(List<AndroidApplication> applications) {
-        Collections.sort(applications, new Comparator<AndroidApplication>() {
-            @Override
-            public int compare(AndroidApplication app1, AndroidApplication app2) {
-            return app2.getWarnablePermissions().size() - app1.getWarnablePermissions().size();
-            }
-        });
+        for(ApplicationDatabaseChangeListener applicationDatabaseChangeListener : applicationDatabaseChangeListeners)
+            applicationDatabaseChangeListener.applicationsDatabaseUpdated(performSynchronizedTask(TASK_RETURN_A_COPY, applications));
     }
 
     @NonNull
@@ -193,5 +184,14 @@ public class ApplicationsDatabase {
     }
     public void removeApplicationDatabaseChangeListener(ApplicationDatabaseChangeListener applicationDatabaseChangeListener){
         applicationDatabaseChangeListeners.remove(applicationDatabaseChangeListener);
+    }
+
+    public AndroidApplication getApplication(String packageName) {
+        if(packageName == null)
+            return null;
+        int indexOfApplication = applications.indexOf(new AndroidApplication(packageName));
+        if(indexOfApplication == -1)
+            return null;
+        return applications.get(indexOfApplication);
     }
 }

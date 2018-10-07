@@ -7,7 +7,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static android.app.AlarmManager.INTERVAL_HOUR;
@@ -47,4 +50,12 @@ public class Utils {
         alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 0, INTERVAL_HOUR * 4, pendingIntent);
     }
 
+    public static void sort(List<AndroidApplication> applications) {
+        Collections.sort(applications, new Comparator<AndroidApplication>() {
+            @Override
+            public int compare(AndroidApplication app1, AndroidApplication app2) {
+                return app2.getWarnablePermissions().size() - app1.getWarnablePermissions().size();
+            }
+        });
+    }
 }

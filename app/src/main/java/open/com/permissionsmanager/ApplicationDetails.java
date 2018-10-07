@@ -18,11 +18,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import static open.com.permissionsmanager.MainActivity.APPLICATION_PACKAGE_NAME;
+
 public class ApplicationDetails extends AppCompatActivity {
     private AndroidApplication application;
     private LayoutInflater layoutInflater;
     private ApplicationsDatabase applicationsDatabase;
-    public static final String APPLICATION_INDEX = "APPLICATION_INDEX";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +31,13 @@ public class ApplicationDetails extends AppCompatActivity {
         layoutInflater = getLayoutInflater();
         setContentView(R.layout.activity_application_details);
         Intent intent = getIntent();
-        int applicationIndex = intent.getIntExtra(APPLICATION_INDEX, -1);
-        if(applicationIndex == -1)
+        String packageName = intent.getStringExtra(APPLICATION_PACKAGE_NAME);
+        if(packageName == null)
             finish();
-        applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(ApplicationDetails.this);
-        application = ApplicationsDatabase.getApplicationsDatabase(this).getACopyOfApplications().get(applicationIndex);
+        applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(this);
+        application = applicationsDatabase.getApplication(packageName);
+        if(application == null)
+            finish();
         addApplicationDetails();
         final ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
         final List<String> warnablePermissions = application.getWarnablePermissions();

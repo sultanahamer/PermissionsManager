@@ -14,10 +14,10 @@ import android.widget.ListView;
 import java.util.List;
 
 import static android.view.View.GONE;
-import static open.com.permissionsmanager.ApplicationDetails.APPLICATION_INDEX;
 
 
 public class MainActivity extends AppCompatActivity implements ApplicationDatabaseChangeListener {
+    public static final String APPLICATION_PACKAGE_NAME = "APPLICATION_PACKAGE_NAME";
     private ApplicationsDatabase applicationsDatabase;
     private List<AndroidApplication> applications;
     private ListView listOfApplications_listView;
@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intentToShowApplicationDetails = new Intent(MainActivity.this, ApplicationDetails.class);
-                intentToShowApplicationDetails.putExtra(APPLICATION_INDEX, position);
+                intentToShowApplicationDetails.putExtra(APPLICATION_PACKAGE_NAME, ((ApplicationsArrayAdapter)parent.getAdapter()).getItem(position).getPackageName());
                 startActivity(intentToShowApplicationDetails);
             }
         });
@@ -63,10 +63,6 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
             Utils.setAlarm(this);
             sharedPreferences.edit().putBoolean(alarm_set_key, true).apply();
         }
-    }
-
-    private void getApplicationsDatabase() {
-        applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(this);
     }
 
     private void showSpinner() {
@@ -136,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
         ApplicationsArrayAdapter adapter = (ApplicationsArrayAdapter) listOfApplications_listView.getAdapter();
         if(adapter == null)
             return;
+        Utils.sort(applications);
         updateView();
     }
 }
