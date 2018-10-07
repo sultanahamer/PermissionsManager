@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -28,6 +29,8 @@ public class ApplicationsArrayAdapter extends ArrayAdapter<AndroidApplication> {
         if(reusableView == null)
             reusableView = layoutInflater.inflate(R.layout.application_info_row, parent, false);
         TextView applicationName = (TextView) reusableView.findViewById(R.id.title);
+        ImageView appIcon = (ImageView) reusableView.findViewById(R.id.app_icon);
+        appIcon.setImageDrawable(androidApplication.getIcon());
         applicationName.setText(androidApplication.getName());
         TextView warningCount = (TextView) reusableView.findViewById(R.id.warning_count_text);
         warningCount.setText(String.valueOf(androidApplication.getWarnablePermissions().size()));

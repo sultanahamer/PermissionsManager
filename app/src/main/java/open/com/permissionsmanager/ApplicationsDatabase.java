@@ -9,8 +9,6 @@ import android.content.pm.PermissionInfo;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -63,7 +61,7 @@ public class ApplicationsDatabase {
         AndroidApplication androidApplication;
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         for (ApplicationInfo applicationInfo : packages) {
-            if(!applicationInfo.enabled)
+            if(!applicationInfo.enabled || applicationInfo.packageName.startsWith("com.android."))
                 continue;
             try {
                 androidApplication = createAndroidApplication(pm, applicationInfo);
@@ -98,7 +96,7 @@ public class ApplicationsDatabase {
                 }
             }
         }
-        return new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, nonwarnablePermission, warnablePermissions);
+        return new AndroidApplication(getApplicationName(pm, applicationInfo), packageInfo.packageName, nonwarnablePermission, warnablePermissions, pm.getApplicationIcon(packageInfo.packageName));
     }
 
     @NonNull

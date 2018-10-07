@@ -1,5 +1,7 @@
 package open.com.permissionsmanager;
 
+import android.graphics.drawable.Drawable;
+
 import java.util.List;
 
 /**
@@ -12,16 +14,18 @@ public class AndroidApplication {
     private String name;
     private List<String> nonwarnablePermissions;
     private List<String> warnablePermissions;
+    private Drawable icon;
 
     public AndroidApplication(String packageName){
         this.packageName = packageName;
     }
 
-    public AndroidApplication(String name, String packageName, List<String> nonwarnablePermissions, List<String> warnablePermissions) {
+    public AndroidApplication(String name, String packageName, List<String> nonwarnablePermissions, List<String> warnablePermissions, Drawable icon) {
         this.packageName = packageName;
         this.name = name;
         this.nonwarnablePermissions = nonwarnablePermissions;
         this.warnablePermissions = warnablePermissions;
+        this.icon = icon;
     }
 
     public String getPackageName() {
@@ -54,6 +58,15 @@ public class AndroidApplication {
     public void setWarnablePermissions(List<String> warnablePermissions) {
         this.warnablePermissions = warnablePermissions;
     }
+
+    public Drawable getIcon() {
+        return icon;
+    }
+
+    public void setIcon(Drawable icon) {
+        this.icon = icon;
+    }
+
 
     @Override
     public boolean equals(Object o) {

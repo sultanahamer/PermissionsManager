@@ -73,13 +73,13 @@ public class ApplicationDetails extends AppCompatActivity {
         final List<String> warnablePermissions = getNameSpaceTruncatedPermissions(application.getWarnablePermissions());
         setTitle(application.getName());
         ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.application_info_row){
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.permission_row){
             @NonNull
             @Override
             public View getView(int position, View reusableView, ViewGroup parent) {
                 String permission = getItem(position);
                 if(reusableView == null)
-                    reusableView = layoutInflater.inflate(R.layout.application_info_row, parent, false);
+                    reusableView = layoutInflater.inflate(R.layout.permission_row, parent, false);
                 TextView permission_textView = (TextView) reusableView.findViewById(R.id.title);
                 ImageView warningImage = (ImageView) reusableView.findViewById(R.id.warning_image);
                 if(warnablePermissions.contains(permission))

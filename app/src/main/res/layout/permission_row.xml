@@ -3,15 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+     android:layout_height="wrap_content">
 
-    <ImageView
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:id="@+id/app_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp" />
     <ImageView
         android:id="@+id/warning_image"
         android:layout_width="20dp"
@@ -37,11 +30,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@id/app_icon"
-        android:layout_toEndOf="@id/app_icon"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
         android:text="TextView"
         tools:text="Application Name"
-         />
+
+        />
 </RelativeLayout>
