@@ -140,12 +140,6 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
         }
     }
 
-    private void showSpinner() {
-        findViewById(R.id.progressbar).setVisibility(View.VISIBLE);
-        listOfApplications_listView.setVisibility(View.GONE);
-        ignoreListOfApplications_listView.setVisibility(View.GONE);
-    }
-
     private void updateApplicationsList() {
         showSpinner();
         new AsyncTask<Void, Void, Void>(){
@@ -158,10 +152,21 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
         }.execute();
     }
 
+    private void showSpinner() {
+        findViewById(R.id.progressbar).setVisibility(View.VISIBLE);
+        warnableAppsToggle.setVisibility(View.GONE);
+        ignoredAppsToggle.setVisibility(View.GONE);
+        listOfApplications_listView.setVisibility(View.GONE);
+        ignoreListOfApplications_listView.setVisibility(View.GONE);
+    }
+
     private void hideSpinner() {
         findViewById(R.id.progressbar).setVisibility(View.GONE);
+        warnableAppsToggle.setVisibility(View.VISIBLE);
+        ignoredAppsToggle.setVisibility(View.VISIBLE);
         listOfApplications_listView.setVisibility(View.VISIBLE);
         ignoreListOfApplications_listView.setVisibility(View.VISIBLE);
+
     }
 
     @Override
