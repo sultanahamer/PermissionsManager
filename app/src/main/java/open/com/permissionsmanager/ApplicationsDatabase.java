@@ -35,6 +35,10 @@ public class ApplicationsDatabase {
         this.context = context;
         permissionsManagerSharedPreferences = Utils.getSharedPreferences(context);
         applicationDatabaseChangeListeners = new ArrayList<>(3);
+        updateApplicationsDatabaseAsync();
+    }
+
+    private void updateApplicationsDatabaseAsync() {
         new Thread() {
             @Override
             public void run() {
@@ -84,7 +88,7 @@ public class ApplicationsDatabase {
                     continue;
                 newApplicationsList.add(androidApplication);
             } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
+                System.out.println("name not found for package " + applicationInfo.packageName + " hence skipping it");
             }
         }
         performSynchronizedTask(TASK_REPLACE, newApplicationsList);
@@ -164,12 +168,18 @@ public class ApplicationsDatabase {
                 .putInt(SHARED_PREF_KEY_DUMMY, new Random().nextInt())
                 .putStringSet(context.getString(R.string.allowed_permissions), ignoredPermissionsForAllApps)
                 .apply();
-        new Thread() {
-            @Override
-            public void run() {
-                updateApplicationsDatabase();
-            }
-        }.start();
+        updateApplicationsDatabase();
+    }
+
+    public void unignorePermissionForAllApps(String permission) {//TODO: refactor this block as this looks quite similar to above
+        Set<String> ignoredPermissionsForAllApps = getIgnoredPermissionsForAllApps();
+        ignoredPermissionsForAllApps.remove(permission);
+        permissionsManagerSharedPreferences
+                .edit()
+                .putInt(SHARED_PREF_KEY_DUMMY, new Random().nextInt())
+                .putStringSet(context.getString(R.string.allowed_permissions), ignoredPermissionsForAllApps)
+                .apply();
+        updateApplicationsDatabase();
     }
 
     public void ignorePermissionForSpecificApp(String packageName, String permission) {
@@ -192,7 +202,30 @@ public class ApplicationsDatabase {
                 .putInt(SHARED_PREF_KEY_DUMMY, new Random().nextInt())
                 .putStringSet(packageName, ignoredPermissionsForGivenApp)
                 .apply();
-        permissionsManagerSharedPreferences = Utils.getSharedPreferences(context);
+
+        for (ApplicationDatabaseChangeListener applicationDatabaseChangeListener : applicationDatabaseChangeListeners)
+            applicationDatabaseChangeListener.applicationPermissionsUpdated(application);
+    }
+
+    public void unignorePermissionForSpecificApp(String packageName, String permission) {//TODO: refactor this block as this looks quite similar to above
+        int indexOfApp = applications.indexOf(new AndroidApplication(packageName));
+        if (indexOfApp == -1)
+            return;
+        AndroidApplication application = applications.get(indexOfApp);
+        List<String> warnablePermissions = application.getWarnablePermissions();
+        if (warnablePermissions.contains(permission))
+            return;
+        warnablePermissions.add(permission);
+        application.getNonwarnablePermissions().remove(permission);
+
+        Set<String> ignoredPermissionsForGivenApp = getAppSpecificIgnoreList(packageName);
+        ignoredPermissionsForGivenApp.remove(permission);
+
+        permissionsManagerSharedPreferences
+                .edit()
+                .putInt(SHARED_PREF_KEY_DUMMY, new Random().nextInt())
+                .putStringSet(packageName, ignoredPermissionsForGivenApp)
+                .apply();
 
         for (ApplicationDatabaseChangeListener applicationDatabaseChangeListener : applicationDatabaseChangeListeners)
             applicationDatabaseChangeListener.applicationPermissionsUpdated(application);

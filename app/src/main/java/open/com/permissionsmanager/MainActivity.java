@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
             @Override
             public boolean onItemLongClick(final AdapterView<?> parent, View view, final int position, long id) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle(isWarnableAppsList ? R.string.add_to_temporary_ignore_list : R.string.stop_ignoring)
+                builder.setTitle(isWarnableAppsList ? R.string.add_to_ignore_list : R.string.stop_ignoring)
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -254,14 +254,8 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
             @Override
             public void run() {
                 warnableApplications.add(application);
-                ApplicationsArrayAdapter warnableApplicationsAdapter = (ApplicationsArrayAdapter) listOfApplications_listView.getAdapter();
-                warnableApplicationsAdapter.add(application);
-                warnableApplicationsAdapter.notifyDataSetChanged();
-
                 ignoredApplications.remove(application);
-                ApplicationsArrayAdapter ignoredApplicationsAdapter = (ApplicationsArrayAdapter) ignoreListOfApplications_listView.getAdapter();
-                ignoredApplicationsAdapter.remove(application);
-                ignoredApplicationsAdapter.notifyDataSetChanged();
+                updateView();
             }
         });
     }

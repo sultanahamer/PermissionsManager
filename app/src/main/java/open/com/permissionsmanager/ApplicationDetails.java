@@ -41,29 +41,46 @@ public class ApplicationDetails extends AppCompatActivity {
         addApplicationDetails();
         final ListView permissionsList_listView = (ListView) findViewById(R.id.permissions);
         final List<String> warnablePermissions = application.getWarnablePermissions();
+        final List<String> nonWarnablePermissions = application.getNonwarnablePermissions();
         final int numberOfWarnablePermissions = warnablePermissions.size();
         permissionsList_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
 
                 if(position >= numberOfWarnablePermissions)
-                    return;
-                AlertDialog.Builder builder = new AlertDialog.Builder(ApplicationDetails.this);
-                builder.setTitle(R.string.ignore_for)
+                    new AlertDialog.Builder(ApplicationDetails.this)
+                        .setTitle(R.string.unignore_for)
                         .setItems(new String[]{"All apps", "This app", "Cancel"}, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 switch(which){
                                     case 0:
-                                        applicationsDatabase.ignorePermissionForAllApps(warnablePermissions.get(position));
+                                        applicationsDatabase.unignorePermissionForAllApps(nonWarnablePermissions.get(position - numberOfWarnablePermissions));
                                         recreate();
                                         break;
                                     case 1:
-                                        applicationsDatabase.ignorePermissionForSpecificApp(application.getPackageName(), warnablePermissions.get(position));
+                                        applicationsDatabase.unignorePermissionForSpecificApp(application.getPackageName(), nonWarnablePermissions.get(position - numberOfWarnablePermissions));
                                         recreate();
                                         break;
                                 }
                             }
                         }).show();
+                else
+                    new AlertDialog.Builder(ApplicationDetails.this)//TODO: refactor this block as this looks quite similar to above
+                            .setTitle(R.string.ignore_for)
+                            .setItems(new String[]{"All apps", "This app", "Cancel"}, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    switch(which){
+                                        case 0:
+                                            applicationsDatabase.ignorePermissionForAllApps(warnablePermissions.get(position));
+                                            recreate();
+                                            break;
+                                        case 1:
+                                            applicationsDatabase.ignorePermissionForSpecificApp(application.getPackageName(), warnablePermissions.get(position));
+                                            recreate();
+                                            break;
+                                    }
+                                }
+                            }).show();
 
             }
         });

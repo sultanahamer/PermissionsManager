@@ -3,10 +3,11 @@
     <string name="allowed_permissions">allowedPermissions</string>
     <string name="permissions_manager">permissions_manager</string>
     <string name="ignore_for">Ignore for</string>
+    <string name="unignore_for">Unignore for</string>
     <string name="alarm_set">ALARM_SET</string>
     <string name="apps_with_warnings_count">Apps with warnings:</string>
     <string name="refresh">Refresh</string>
-    <string name="add_to_temporary_ignore_list">Ignore for a month?</string>
+    <string name="add_to_ignore_list">Add to ignore list?</string>
     <string name="stop_ignoring">Stop Ignoring?</string>
     <string name="apps_with_dangerous_permissions_lurking">Apps with dangerous permissions lurking!!!</string>
     <string name="attention">Attention</string>

@@ -60,6 +60,8 @@
          />
     <ListView
         android:id="@+id/list_ignored_apps"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:layout_below="@id/ignored_apps_toggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
