@@ -55,11 +55,11 @@ public class ApplicationDetails extends AppCompatActivity {
                                 switch(which){
                                     case 0:
                                         applicationsDatabase.ignorePermissionForAllApps(warnablePermissions.get(position));
-                                        view.findViewById(R.id.warning_image).setVisibility(View.GONE);
+                                        recreate();
                                         break;
                                     case 1:
                                         applicationsDatabase.ignorePermissionForSpecificApp(application.getPackageName(), warnablePermissions.get(position));
-                                        view.findViewById(R.id.warning_image).setVisibility(View.GONE);
+                                        recreate();
                                         break;
                                 }
                             }
