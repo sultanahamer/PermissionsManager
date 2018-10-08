@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -15,7 +16,7 @@ import java.util.Set;
 
 import static android.app.AlarmManager.INTERVAL_HOUR;
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
-import static open.com.permissionsmanager.ValidatePermissionsBroadcastReceiver.REQUEST_CODE;
+import static open.com.permissionsmanager.ValidatePermissionsBroadcastReceiver.GENERIC_REQUEST_CODE;
 
 /**
  * Created by sultanm on 1/23/18.
@@ -24,8 +25,9 @@ import static open.com.permissionsmanager.ValidatePermissionsBroadcastReceiver.R
 public class Utils {
 
     public static final String SCAN = "SCAN";
+    public static final String SHARED_PREFERENCES_KEY_IGNORED_APPLICATIONS_WARN_TIMESTAMP = "SHARED_PREFERENCES_KEY_IGNORED_APPLICATIONS_WARN_TIMESTAMP";
 
-    public static HashSet<String> makeHashSet(String content, String delimiter){
+    public static HashSet<String> getHashSet(String content, String delimiter){
         return new HashSet<>(Arrays.asList(content.split(delimiter)));
     }
 
@@ -45,7 +47,7 @@ public class Utils {
 
         Intent broadcastIntent = new Intent(context.getApplicationContext(), ValidatePermissionsBroadcastReceiver.class);
         broadcastIntent.setAction(SCAN);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, broadcastIntent, FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, GENERIC_REQUEST_CODE, broadcastIntent, FLAG_UPDATE_CURRENT);
         alarmManager.cancel(pendingIntent);
         alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 0, INTERVAL_HOUR * 4, pendingIntent);
     }
@@ -57,5 +59,30 @@ public class Utils {
                 return app2.getWarnablePermissions().size() - app1.getWarnablePermissions().size();
             }
         });
+    }
+
+    public static long getLastIgnoredApplicationsWarningNotifiedInstance(Context context){
+        return getSharedPreferences(context)
+                .getLong(SHARED_PREFERENCES_KEY_IGNORED_APPLICATIONS_WARN_TIMESTAMP, 0);
+
+    }
+
+    public static void setLastIgnoredApplicationsWarningNotifiedInstance(Context context, long timestamp){
+        getSharedPreferences(context)
+                .edit()
+                .putLong(SHARED_PREFERENCES_KEY_IGNORED_APPLICATIONS_WARN_TIMESTAMP, timestamp)
+                .apply();
+    }
+
+    public static Calendar getCalendarInstanceRelativeFromNow(int field, int amount){
+        Calendar instance = Calendar.getInstance();
+        instance.add(field, amount);
+        return instance;
+    }
+
+    public static Calendar getCalendarInstanceWith(long timestamp){
+        Calendar instance = Calendar.getInstance();
+        instance.setTimeInMillis(timestamp);
+        return instance;
     }
 }

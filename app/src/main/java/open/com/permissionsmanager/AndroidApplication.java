@@ -15,24 +15,25 @@ public class AndroidApplication {
     private List<String> nonwarnablePermissions;
     private List<String> warnablePermissions;
     private Drawable icon;
+    private boolean ignoredTemporarily = false;
 
     public AndroidApplication(String packageName){
         this.packageName = packageName;
     }
 
-    public AndroidApplication(String name, String packageName, List<String> nonwarnablePermissions, List<String> warnablePermissions, Drawable icon) {
-        this.packageName = packageName;
-        this.name = name;
-        this.nonwarnablePermissions = nonwarnablePermissions;
-        this.warnablePermissions = warnablePermissions;
-        this.icon = icon;
+    public boolean isIgnoredTemporarily() {
+        return ignoredTemporarily;
+    }
+
+    private void setIgnoredTemporarily(boolean ignoredTemporarily) {
+        this.ignoredTemporarily = ignoredTemporarily;
     }
 
     public String getPackageName() {
         return packageName;
     }
 
-    public void setPackageName(String packageName) {
+    private void setPackageName(String packageName) {
         this.packageName = packageName;
     }
 
@@ -40,7 +41,7 @@ public class AndroidApplication {
         return nonwarnablePermissions;
     }
 
-    public void setNonwarnablePermissions(List<String> nonwarnablePermissions) {
+    private void setNonwarnablePermissions(List<String> nonwarnablePermissions) {
         this.nonwarnablePermissions = nonwarnablePermissions;
     }
 
@@ -48,14 +49,14 @@ public class AndroidApplication {
         return name;
     }
 
-    public void setName(String name) {
+    private void setName(String name) {
         this.name = name;
     }
     public List<String> getWarnablePermissions() {
         return warnablePermissions;
     }
 
-    public void setWarnablePermissions(List<String> warnablePermissions) {
+    private void setWarnablePermissions(List<String> warnablePermissions) {
         this.warnablePermissions = warnablePermissions;
     }
 
@@ -63,7 +64,7 @@ public class AndroidApplication {
         return icon;
     }
 
-    public void setIcon(Drawable icon) {
+    private void setIcon(Drawable icon) {
         this.icon = icon;
     }
 
@@ -76,5 +77,42 @@ public class AndroidApplication {
         AndroidApplication that = (AndroidApplication) o;
 
         return packageName.equals(that.packageName);
+    }
+
+    public static class Builder{
+        private AndroidApplication androidApplication;
+
+        public Builder(String packageName){
+            androidApplication = new AndroidApplication(packageName);
+        }
+
+        public Builder withName(String name){
+            androidApplication.setName(name);
+            return this;
+        }
+
+        public Builder withWarnablePermissions(List<String> warnablePermissions){
+            androidApplication.setWarnablePermissions(warnablePermissions);
+            return this;
+        }
+
+        public Builder withNonWarnablePermissions(List<String> nonWarnablePermissions){
+            androidApplication.setNonwarnablePermissions(nonWarnablePermissions);
+            return this;
+        }
+
+        public Builder withIcon(Drawable drawable){
+            androidApplication.setIcon(drawable);
+            return this;
+        }
+
+        public Builder withIgnoredTemporarily(boolean ignored){
+            androidApplication.setIgnoredTemporarily(ignored);
+            return this;
+        }
+
+        public AndroidApplication build() {
+            return androidApplication;
+        }
     }
 }

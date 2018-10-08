@@ -6,4 +6,11 @@
     <string name="alarm_set">ALARM_SET</string>
     <string name="apps_with_warnings_count">Apps with warnings:</string>
     <string name="refresh">Refresh</string>
+    <string name="add_to_temporary_ignore_list">Ignore for a month?</string>
+    <string name="stop_ignoring">Stop Ignoring?</string>
+    <string name="apps_with_dangerous_permissions_lurking">Apps with dangerous permissions lurking!!!</string>
+    <string name="attention">Attention</string>
+    <string name="warnable_apps">Warnable Apps</string>
+    <string name="temporarily_ignored_apps">Temporarily ignored apps</string>
+    <string name="look_ignored_apps">Have a look at ignored apps</string>
 </resources>
