@@ -6,13 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static android.app.AlarmManager.INTERVAL_HOUR;
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
@@ -27,17 +24,6 @@ public class Utils {
     public static final String SCAN = "SCAN";
     public static final String SHARED_PREFERENCES_KEY_IGNORED_APPLICATIONS_WARN_TIMESTAMP = "SHARED_PREFERENCES_KEY_IGNORED_APPLICATIONS_WARN_TIMESTAMP";
 
-    public static HashSet<String> getHashSet(String content, String delimiter){
-        return new HashSet<>(Arrays.asList(content.split(delimiter)));
-    }
-
-    public static String makeString(Set<String> set, String delimiter) {
-        StringBuffer stringBuffer = new StringBuffer();
-        for(String key : set){
-            stringBuffer.append(key).append(delimiter);
-        }
-        return stringBuffer.toString();
-    }
     public static SharedPreferences getSharedPreferences(Context context) {
         return context.getSharedPreferences(context.getString(R.string.permissions_manager), context.MODE_PRIVATE);
     }

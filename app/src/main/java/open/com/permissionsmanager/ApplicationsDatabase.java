@@ -27,7 +27,6 @@ public class ApplicationsDatabase {
     private List<AndroidApplication> applications = new ArrayList<>();
     private Context context;
     private SharedPreferences permissionsManagerSharedPreferences;
-    private Set<String> ignoredPermissionsForAllApps;
     private static ApplicationsDatabase applicationsDatabase;
     private List<ApplicationDatabaseChangeListener> applicationDatabaseChangeListeners;
     private boolean scanInProgress = false;
@@ -74,14 +73,13 @@ public class ApplicationsDatabase {
         PackageManager pm = context.getPackageManager();
         AndroidApplication androidApplication;
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-        String ignoredPermissionsForAllAppsString = permissionsManagerSharedPreferences.getString(context.getString(R.string.allowed_permissions), "");
-        ignoredPermissionsForAllApps = Utils.getHashSet(ignoredPermissionsForAllAppsString, ";");
+        Set<String> ignoredPermissionsForAllApps = getIgnoredPermissionsForAllApps();
         Set<String> temporarilyIgnoredApps = permissionsManagerSharedPreferences.getStringSet(SHARED_PREF_KEY_TEMPORARILY_IGNORED_APPS, new HashSet<String>(0));
         for (ApplicationInfo applicationInfo : packages) {
             if (!applicationInfo.enabled || applicationInfo.packageName.startsWith(AOSP_APPS_PREFIX))
                 continue;
             try {
-                androidApplication = createAndroidApplication(pm, applicationInfo, temporarilyIgnoredApps);
+                androidApplication = createAndroidApplication(pm, applicationInfo, temporarilyIgnoredApps, ignoredPermissionsForAllApps);
                 if (androidApplication.getWarnablePermissions().size() == 0)
                     continue;
                 newApplicationsList.add(androidApplication);
@@ -96,14 +94,14 @@ public class ApplicationsDatabase {
     }
 
     @NonNull
-    private AndroidApplication createAndroidApplication(PackageManager pm, ApplicationInfo applicationInfo, Set<String> temporarilyIgnoredApps) throws PackageManager.NameNotFoundException {
+    private AndroidApplication createAndroidApplication(PackageManager pm, ApplicationInfo applicationInfo, Set<String> temporarilyIgnoredApps, Set<String> ignoredPermissionsForAllApps) throws PackageManager.NameNotFoundException {
         PackageInfo packageInfo;
         packageInfo = pm.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS);
         List<String> nonwarnablePermission = new ArrayList<>();
         List<String> warnablePermissions = new ArrayList<>(3);
-        HashSet<String> appSpecificIgnoreList;
+        Set<String> appSpecificIgnoreList;
         if (packageInfo.requestedPermissions != null) {
-            appSpecificIgnoreList = getAppSpecificIgnoreList(applicationInfo);
+            appSpecificIgnoreList = getAppSpecificIgnoreList(applicationInfo.packageName);
             for (String permission : packageInfo.requestedPermissions) {
                 if (pm.checkPermission(permission, packageInfo.packageName) == PackageManager.PERMISSION_GRANTED) {
                     if (isDangerous(permission, pm) && !ignoredPermissionsForAllApps.contains(permission) && !appSpecificIgnoreList.contains(permission))
@@ -123,8 +121,8 @@ public class ApplicationsDatabase {
     }
 
     @NonNull
-    private HashSet<String> getAppSpecificIgnoreList(ApplicationInfo applicationInfo) {
-        return Utils.getHashSet(permissionsManagerSharedPreferences.getString(applicationInfo.packageName, ""), ";");
+    private Set<String> getAppSpecificIgnoreList(String packageName) {
+        return permissionsManagerSharedPreferences.getStringSet(packageName, new HashSet<String>(0));
     }
 
     private boolean isDangerous(String permission, PackageManager pm) throws PackageManager.NameNotFoundException {
@@ -154,18 +152,18 @@ public class ApplicationsDatabase {
 //        }
 //    }
 
-    public HashSet<String> getIgnoredPermissionsForAllApps() {
-        String ignoredPermissionsForAllAppsString = permissionsManagerSharedPreferences.getString(context.getString(R.string.allowed_permissions), "");
-        return Utils.getHashSet(ignoredPermissionsForAllAppsString, ";");
+    public Set<String> getIgnoredPermissionsForAllApps() {
+        return permissionsManagerSharedPreferences.getStringSet(context.getString(R.string.allowed_permissions), new HashSet<String>(0));
     }
 
     public void ignorePermissionForAllApps(String permission) {
+        Set<String> ignoredPermissionsForAllApps = getIgnoredPermissionsForAllApps();
         ignoredPermissionsForAllApps.add(permission);
         permissionsManagerSharedPreferences
                 .edit()
-                .putString(context.getString(R.string.allowed_permissions), Utils.makeString(ignoredPermissionsForAllApps, ";"))
+                .putInt(SHARED_PREF_KEY_DUMMY, new Random().nextInt())
+                .putStringSet(context.getString(R.string.allowed_permissions), ignoredPermissionsForAllApps)
                 .apply();
-        updateAllowedPermissions();
         new Thread() {
             @Override
             public void run() {
@@ -185,13 +183,14 @@ public class ApplicationsDatabase {
         warnablePermissions.remove(permission);
         application.getNonwarnablePermissions().add(permission);
 
-        String ignoredPermissionsForGivenAppAsString = permissionsManagerSharedPreferences.getString(packageName, "");
-        HashSet<String> ignoredPermissionsForSpecificApp = Utils.getHashSet(ignoredPermissionsForGivenAppAsString, ";");
-        ignoredPermissionsForSpecificApp.add(permission);
+
+        Set<String> ignoredPermissionsForGivenApp = getAppSpecificIgnoreList(packageName);
+        ignoredPermissionsForGivenApp.add(permission);
 
         permissionsManagerSharedPreferences
                 .edit()
-                .putString(packageName, Utils.makeString(ignoredPermissionsForSpecificApp, ";"))
+                .putInt(SHARED_PREF_KEY_DUMMY, new Random().nextInt())
+                .putStringSet(packageName, ignoredPermissionsForGivenApp)
                 .apply();
         permissionsManagerSharedPreferences = Utils.getSharedPreferences(context);
 
@@ -199,9 +198,6 @@ public class ApplicationsDatabase {
             applicationDatabaseChangeListener.applicationPermissionsUpdated(application);
     }
 
-    private void updateAllowedPermissions() {
-        ignoredPermissionsForAllApps = getIgnoredPermissionsForAllApps();
-    }
 
     public void addApplicationDatabaseChangeListener(ApplicationDatabaseChangeListener applicationDatabaseChangeListener) {
         applicationDatabaseChangeListeners.add(applicationDatabaseChangeListener);
