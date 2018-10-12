@@ -28,12 +28,19 @@ public class Utils {
         return context.getSharedPreferences(context.getString(R.string.permissions_manager), context.MODE_PRIVATE);
     }
 
+    private static Intent getIntentToBroadcastValidatePermissions(Context context){
+        return new Intent(context.getApplicationContext(), ValidatePermissionsBroadcastReceiver.class)
+                    .setAction(SCAN);
+    }
+    public static boolean isAlarmSet(Context context){
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, GENERIC_REQUEST_CODE, getIntentToBroadcastValidatePermissions(context), PendingIntent.FLAG_NO_CREATE);
+        return pendingIntent == null;
+    }
+
     public static void setAlarm(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        Intent broadcastIntent = new Intent(context.getApplicationContext(), ValidatePermissionsBroadcastReceiver.class);
-        broadcastIntent.setAction(SCAN);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, GENERIC_REQUEST_CODE, broadcastIntent, FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, GENERIC_REQUEST_CODE, getIntentToBroadcastValidatePermissions(context), FLAG_UPDATE_CURRENT);
         alarmManager.cancel(pendingIntent);
         alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 0, INTERVAL_HOUR * 4, pendingIntent);
     }

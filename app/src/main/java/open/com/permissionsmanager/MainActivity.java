@@ -2,7 +2,6 @@ package open.com.permissionsmanager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -32,7 +31,9 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setAlarmIfNotSet();
+        if(!Utils.isAlarmSet(this)){
+            Utils.setAlarm(this);
+        }
         setContentView(R.layout.activity_main);
         applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(this);
         applicationsDatabase.addApplicationDatabaseChangeListener(this);
@@ -129,15 +130,6 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
             }
         });
         return super.onCreateOptionsMenu(menu);
-    }
-
-    private void setAlarmIfNotSet() {
-        SharedPreferences sharedPreferences = Utils.getSharedPreferences(this);
-        String alarm_set_key = getString(R.string.alarm_set);
-        if(!sharedPreferences.contains(alarm_set_key)){
-            Utils.setAlarm(this);
-            sharedPreferences.edit().putBoolean(alarm_set_key, true).apply();
-        }
     }
 
     private void updateApplicationsList() {
