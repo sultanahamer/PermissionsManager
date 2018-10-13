@@ -34,7 +34,7 @@ public class Utils {
     }
     public static boolean isAlarmSet(Context context){
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, GENERIC_REQUEST_CODE, getIntentToBroadcastValidatePermissions(context), PendingIntent.FLAG_NO_CREATE);
-        return pendingIntent == null;
+        return pendingIntent != null;
     }
 
     public static void setAlarm(Context context) {
