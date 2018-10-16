@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -42,7 +43,7 @@ public class Utils {
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, GENERIC_REQUEST_CODE, getIntentToBroadcastValidatePermissions(context), FLAG_UPDATE_CURRENT);
         alarmManager.cancel(pendingIntent);
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 0, INTERVAL_HOUR * 4, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), INTERVAL_HOUR * 4, pendingIntent);
     }
 
     public static void sort(List<AndroidApplication> applications) {

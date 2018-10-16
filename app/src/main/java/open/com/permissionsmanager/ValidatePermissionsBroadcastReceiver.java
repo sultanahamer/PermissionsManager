@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.Calendar;
@@ -57,6 +58,8 @@ public class ValidatePermissionsBroadcastReceiver extends BroadcastReceiver{
                 .setTicker(context.getString(R.string.apps_with_dangerous_permissions_lurking))
                 .setContentText(context.getString(R.string.apps_with_dangerous_permissions_lurking))
                 .setContentTitle(context.getString(R.string.attention))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentIntent(PendingIntent.getActivity(context, GENERIC_REQUEST_CODE, new Intent(context, MainActivity.class), FLAG_UPDATE_CURRENT))
                 .build();
         System.out.println("notifying on usual scan results yolo");
@@ -69,6 +72,8 @@ public class ValidatePermissionsBroadcastReceiver extends BroadcastReceiver{
                 .setTicker(context.getString(R.string.look_ignored_apps))
                 .setContentText(context.getString(R.string.look_ignored_apps))
                 .setContentTitle(context.getString(R.string.attention))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentIntent(PendingIntent.getActivity(context, GENERIC_REQUEST_CODE, new Intent(context, MainActivity.class), FLAG_UPDATE_CURRENT))
                 .build();
         System.out.println("notifying on ignored apps");

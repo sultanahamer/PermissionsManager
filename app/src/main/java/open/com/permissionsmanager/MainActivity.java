@@ -31,9 +31,6 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(!Utils.isAlarmSet(this)){
-            Utils.setAlarm(this);
-        }
         setContentView(R.layout.activity_main);
         applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(this);
         applicationsDatabase.addApplicationDatabaseChangeListener(this);
@@ -42,6 +39,15 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
             applicationsDatabaseUpdated(applicationsDatabase.getACopyOfApplications());
         else
             showSpinner();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!Utils.isAlarmSet(this)){
+            System.out.println("setting alarm.... yolo bhalo");
+            Utils.setAlarm(this);
+        }
     }
 
     private void setupListViewsAndToggles() {
