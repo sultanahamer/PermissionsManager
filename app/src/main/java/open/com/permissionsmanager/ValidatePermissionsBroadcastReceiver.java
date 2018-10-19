@@ -25,6 +25,7 @@ public class ValidatePermissionsBroadcastReceiver extends BroadcastReceiver{
         if(!SCAN.equals(intent.getAction()))
             return;
         System.out.println("validate permissions broadcast reciever yolo " + intent);
+        Utils.updateLastAlarmTime(context);
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         ApplicationsDatabase applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(context);

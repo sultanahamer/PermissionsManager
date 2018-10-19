@@ -24,6 +24,7 @@ public class Utils {
 
     public static final String SCAN = "SCAN";
     public static final String SHARED_PREFERENCES_KEY_IGNORED_APPLICATIONS_WARN_TIMESTAMP = "SHARED_PREFERENCES_KEY_IGNORED_APPLICATIONS_WARN_TIMESTAMP";
+    public static final String SHARED_PREFERENCES_KEY_LAST_ALARM_TIME = "SHARED_PREFERENCES_KEY_LAST_ALARM_TIME";
 
     public static SharedPreferences getSharedPreferences(Context context) {
         return context.getSharedPreferences(context.getString(R.string.permissions_manager), context.MODE_PRIVATE);
@@ -35,7 +36,11 @@ public class Utils {
     }
     public static boolean isAlarmSet(Context context){
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, GENERIC_REQUEST_CODE, getIntentToBroadcastValidatePermissions(context), PendingIntent.FLAG_NO_CREATE);
-        return pendingIntent != null;
+        return pendingIntent != null | !hasItBeen4HoursSinceLastAlarm(context);
+    }
+
+    private static boolean hasItBeen4HoursSinceLastAlarm(Context context) {
+        return (getSharedPreferences(context).getLong("SHARED_PREFERENCES_KEY_LAST_ALARM_TIME", 0)  + INTERVAL_HOUR * 4) <  System.currentTimeMillis();
     }
 
     public static void setAlarm(Context context) {
@@ -78,5 +83,9 @@ public class Utils {
         Calendar instance = Calendar.getInstance();
         instance.setTimeInMillis(timestamp);
         return instance;
+    }
+
+    public static void updateLastAlarmTime(Context context) {
+        getSharedPreferences(context).edit().putLong(SHARED_PREFERENCES_KEY_LAST_ALARM_TIME, System.currentTimeMillis()).apply();
     }
 }
