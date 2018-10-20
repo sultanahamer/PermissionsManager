@@ -2,11 +2,15 @@ package open.com.permissionsmanager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -31,7 +35,7 @@ public class ApplicationDetails extends AppCompatActivity {
         layoutInflater = getLayoutInflater();
         setContentView(R.layout.activity_application_details);
         Intent intent = getIntent();
-        String packageName = intent.getStringExtra(APPLICATION_PACKAGE_NAME);
+        final String packageName = intent.getStringExtra(APPLICATION_PACKAGE_NAME);
         if(packageName == null)
             finish();
         applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(this);
@@ -84,6 +88,26 @@ public class ApplicationDetails extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add("Edit permissions granted").setIcon(R.drawable.ic_edit_24dp).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                launchApplicationSpecificSettingsActivity();
+                return true;
+            }
+        }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return true;
+    }
+
+    private void launchApplicationSpecificSettingsActivity(){
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Uri uri = Uri.fromParts("package", application.getPackageName(), null);
+        intent.setData(uri);
+        startActivity(intent);
     }
 
     private void addApplicationDetails() {
