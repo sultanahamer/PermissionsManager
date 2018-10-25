@@ -35,15 +35,28 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
         applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(this);
         applicationsDatabase.addApplicationDatabaseChangeListener(this);
         setupListViewsAndToggles();
-        if(!applicationsDatabase.isScanInProgress())
-            applicationsDatabaseUpdated(applicationsDatabase.getACopyOfApplications());
-        else
-            showSpinner();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        scanApplications();
+        showSpinner();
+        setAlarmInCaseIsNotSet();
+    }
+
+    private void scanApplications() {
+        if(applicationsDatabase.isScanInProgress())
+            return;
+        new Thread(){
+            @Override
+            public void run() {
+                applicationsDatabase.updateApplicationsDatabase();
+            }
+        }.start();
+    }
+
+    private void setAlarmInCaseIsNotSet() {
         if(!Utils.isAlarmSet(this)){
             System.out.println("setting alarm.... yolo bhalo");
             Utils.setAlarm(this);
