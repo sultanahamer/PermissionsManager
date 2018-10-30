@@ -40,7 +40,7 @@ public class Utils {
     }
 
     private static boolean hasItBeen4HoursSinceLastAlarm(Context context) {
-        return (getSharedPreferences(context).getLong("SHARED_PREFERENCES_KEY_LAST_ALARM_TIME", 0)  + INTERVAL_HOUR * 4) <  System.currentTimeMillis();
+        return (getSharedPreferences(context).getLong("SHARED_PREFERENCES_KEY_LAST_ALARM_TIME", 0)  + INTERVAL_HOUR) <  System.currentTimeMillis();
     }
 
     public static void setAlarm(Context context) {
@@ -48,7 +48,7 @@ public class Utils {
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, GENERIC_REQUEST_CODE, getIntentToBroadcastValidatePermissions(context), FLAG_UPDATE_CURRENT);
         alarmManager.cancel(pendingIntent);
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), INTERVAL_HOUR * 4, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 1000 * 60, INTERVAL_HOUR, pendingIntent);
     }
 
     public static void sort(List<AndroidApplication> applications) {

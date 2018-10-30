@@ -39,6 +39,7 @@ public class ApplicationsDatabase {
     }
 
     private void updateApplicationsDatabaseAsync() {
+        scanInProgress = true;
         new Thread() {
             @Override
             public void run() {
