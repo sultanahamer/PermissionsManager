@@ -94,6 +94,7 @@ public class ApplicationsDatabase {
         }
         performSynchronizedTask(TASK_REPLACE, newApplicationsList);
         scanInProgress = false;
+        Utils.updateLastScanTime(context);
         for (ApplicationDatabaseChangeListener applicationDatabaseChangeListener : applicationDatabaseChangeListeners)
             applicationDatabaseChangeListener.applicationsDatabaseUpdated(performSynchronizedTask(TASK_RETURN_A_COPY, applications));
     }

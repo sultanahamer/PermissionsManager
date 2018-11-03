@@ -18,8 +18,6 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 public class MainActivity extends AppCompatActivity implements ApplicationDatabaseChangeListener {
     public static final String APPLICATION_PACKAGE_NAME = "APPLICATION_PACKAGE_NAME";
     private ApplicationsDatabase applicationsDatabase;
@@ -35,14 +33,18 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
         applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(this);
         applicationsDatabase.addApplicationDatabaseChangeListener(this);
         setupListViewsAndToggles();
+        scanApplications();
+        showSpinner();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        scanApplications();
-        showSpinner();
         setAlarmInCaseIsNotSet();
+        if(Utils.areScanResultsOlderThan5Mins(this)){
+            scanApplications();
+            showSpinner();
+        }
     }
 
     private void scanApplications() {
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
     }
 
     private void setAlarmInCaseIsNotSet() {
-        if(!Utils.isAlarmSet(this)){
+        if(Utils.shouldSetAlarm(this)){
             System.out.println("setting alarm.... yolo bhalo");
             Utils.setAlarm(this);
         }

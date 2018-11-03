@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
+import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.Calendar;
@@ -19,30 +20,50 @@ public class ValidatePermissionsBroadcastReceiver extends BroadcastReceiver{
 
     public static final int GENERIC_REQUEST_CODE = 123; //generic code used for notification id, pending intent id
     public static final int FOUR_HOURLY_SCAN_RESULT_NOTIICATION_CODE = 123;
+    private PendingResult pendingResult;
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
         if(!SCAN.equals(intent.getAction()))
             return;
         System.out.println("validate permissions broadcast reciever yolo " + intent);
         Utils.updateLastAlarmTime(context);
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        pendingResult = goAsync();
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    final NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                    final ApplicationsDatabase applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(context);
+                    waitAMaxOf2MinutesForScanTOComplete(applicationsDatabase);
+                    if(applicationsDatabase.isScanInProgress()){
+                        System.out.println("something is wrong. scan is taking too long... or someone has restarted scan manually from application...");
+                    }
+                    notifyInCaseOfWarnableApps(notificationManager, applicationsDatabase);
+                    if(!applicationsDatabase.getIgnoredAppsList().isEmpty() && isItTimeToWarnAboutIgnoredApps(context))
+                        warnAboutIgnoredApps(context, notificationManager);
+                }
+                finally {
+                    pendingResult.finish();
+                }
 
-        ApplicationsDatabase applicationsDatabase = ApplicationsDatabase.getApplicationsDatabase(context);
-        waitUntilScanIsComplete(applicationsDatabase);
-        for(AndroidApplication application : applicationsDatabase.getACopyOfApplications()){
-            if(application.isIgnoredTemporarily())
-                continue;
-            warnAboutPermissionsLurking(context, notificationManager);
-            break;
-        }
+            }
 
-        if(!applicationsDatabase.getIgnoredAppsList().isEmpty() && isItTimeToWarnAboutIgnoredApps(context))
-            warnAboutIgnoredApps(context, notificationManager);
+            private void notifyInCaseOfWarnableApps(NotificationManager notificationManager, ApplicationsDatabase applicationsDatabase) {
+                for(AndroidApplication application : applicationsDatabase.getACopyOfApplications()){
+                    if(application.isIgnoredTemporarily())
+                        continue;
+                    warnAboutPermissionsLurking(context, notificationManager);
+                    break;
+                }
+            }
+        }.start();
     }
 
-    private void waitUntilScanIsComplete(ApplicationsDatabase applicationsDatabase) {
-        while(applicationsDatabase.isScanInProgress()){
+    private void waitAMaxOf2MinutesForScanTOComplete(ApplicationsDatabase applicationsDatabase) {
+        long startOfWait = System.currentTimeMillis();
+        long twoMinutes = 1200000;
+        while(applicationsDatabase.isScanInProgress() || System.currentTimeMillis() - startOfWait > twoMinutes){
             try {
                 Thread.sleep(30);
             } catch (InterruptedException e) {
