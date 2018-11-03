@@ -7,13 +7,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
-import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.Calendar;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static java.util.Calendar.MONTH;
+import static open.com.permissionsmanager.Utils.ONE_MINUTE;
 import static open.com.permissionsmanager.Utils.SCAN;
 
 public class ValidatePermissionsBroadcastReceiver extends BroadcastReceiver{
@@ -62,7 +62,7 @@ public class ValidatePermissionsBroadcastReceiver extends BroadcastReceiver{
 
     private void waitAMaxOf2MinutesForScanTOComplete(ApplicationsDatabase applicationsDatabase) {
         long startOfWait = System.currentTimeMillis();
-        long twoMinutes = 1200000;
+        long twoMinutes = 2 * ONE_MINUTE;
         while(applicationsDatabase.isScanInProgress() || System.currentTimeMillis() - startOfWait > twoMinutes){
             try {
                 Thread.sleep(30);

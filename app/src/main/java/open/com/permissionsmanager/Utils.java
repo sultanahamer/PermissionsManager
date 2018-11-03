@@ -26,8 +26,10 @@ public class Utils {
     public static final String SCAN = "SCAN";
     public static final String SHARED_PREFERENCES_KEY_IGNORED_APPLICATIONS_WARN_TIMESTAMP = "SHARED_PREFERENCES_KEY_IGNORED_APPLICATIONS_WARN_TIMESTAMP";
     public static final String SHARED_PREFERENCES_KEY_LAST_ALARM_TIME = "SHARED_PREFERENCES_KEY_LAST_ALARM_TIME";
-    public static final int FIVE_MINUTES = 5 * 60000;
     public static final String SHARED_PREF_KEY_LAST_SCAN_TIME = "LAST_SCAN_TIME";
+    public static final int ONE_MINUTE = 60 * 1000;
+    public static final int FIVE_MINUTES = 5 * ONE_MINUTE;
+    public static final long ALARM_INTERVAL = INTERVAL_HOUR;
 
     public static SharedPreferences getSharedPreferences(Context context) {
         return context.getSharedPreferences(context.getString(R.string.permissions_manager), context.MODE_PRIVATE);
@@ -43,14 +45,14 @@ public class Utils {
     }
 
     private static boolean hasItBeen4HoursSinceLastAlarm(Context context) {
-        return (getSharedPreferences(context).getLong("SHARED_PREFERENCES_KEY_LAST_ALARM_TIME", 0)  + INTERVAL_HOUR) <  System.currentTimeMillis();
+        return (getSharedPreferences(context).getLong("SHARED_PREFERENCES_KEY_LAST_ALARM_TIME", 0)  + ALARM_INTERVAL) <  System.currentTimeMillis();
     }
 
     public static void setAlarm(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, GENERIC_REQUEST_CODE, getIntentToBroadcastValidatePermissions(context), FLAG_UPDATE_CURRENT);
         alarmManager.cancel(pendingIntent);
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 10 * 1000, INTERVAL_HOUR, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + ALARM_INTERVAL, ALARM_INTERVAL, pendingIntent);
     }
 
     public static void sort(List<AndroidApplication> applications) {
