@@ -41,10 +41,10 @@ public class Utils {
     }
     public static boolean shouldSetAlarm(Context context) {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, GENERIC_REQUEST_CODE, getIntentToBroadcastValidatePermissions(context), PendingIntent.FLAG_NO_CREATE);
-        return pendingIntent == null || hasItBeen4HoursSinceLastAlarm(context);
+        return pendingIntent == null || hasItBeenAlarmIntervalSinceLastAlarm(context);
     }
 
-    private static boolean hasItBeen4HoursSinceLastAlarm(Context context) {
+    private static boolean hasItBeenAlarmIntervalSinceLastAlarm(Context context) {
         return (getSharedPreferences(context).getLong("SHARED_PREFERENCES_KEY_LAST_ALARM_TIME", 0)  + ALARM_INTERVAL) <  System.currentTimeMillis();
     }
 
