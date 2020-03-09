@@ -1,0 +1,6 @@
+Warns user about dangerous permissions given to installed apps
+
+Runs a periodic scan and warns users about dangerous permissions given.
+
+User can also add exceptions per app or for whole device.
+Also, app can launch android permissions page to revoke permissions from an app

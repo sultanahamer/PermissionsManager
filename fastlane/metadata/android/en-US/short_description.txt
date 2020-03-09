@@ -1,0 +1,1 @@
+Warns user about dangerous permissions given to installed apps
