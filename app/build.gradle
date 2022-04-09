@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "open.com.permissionsmanager"
-        minSdkVersion 14
+        minSdkVersion 23
         targetSdkVersion 27
         versionCode 3
         versionName "3.0"

@@ -15,6 +15,7 @@ import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static java.util.Calendar.MONTH;
 import static open.com.permissionsmanager.Utils.ONE_MINUTE;
 import static open.com.permissionsmanager.Utils.SCAN;
+import static open.com.permissionsmanager.Utils.setAlarm;
 
 public class ValidatePermissionsBroadcastReceiver extends BroadcastReceiver{
 
@@ -24,8 +25,8 @@ public class ValidatePermissionsBroadcastReceiver extends BroadcastReceiver{
 
     @Override
     public void onReceive(final Context context, Intent intent) {
-        if(!SCAN.equals(intent.getAction()))
-            return;
+        if(!SCAN.equals(intent.getAction())) return;
+        if(Utils.shouldSetAlarm(context)) setAlarm(context);
         System.out.println("validate permissions broadcast reciever yolo " + intent);
         Utils.updateLastAlarmTime(context);
         pendingResult = goAsync();

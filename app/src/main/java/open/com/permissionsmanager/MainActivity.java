@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
 
     private void setAlarmInCaseIsNotSet() {
         if(Utils.shouldSetAlarm(this)){
-            System.out.println("setting alarm.... yolo bhalo");
             Utils.setAlarm(this);
         }
     }
