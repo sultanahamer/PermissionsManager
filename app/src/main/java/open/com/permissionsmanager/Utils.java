@@ -1,11 +1,15 @@
 package open.com.permissionsmanager;
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
 import android.os.SystemClock;
+import android.support.v4.app.NotificationCompat;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -13,7 +17,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import static android.app.AlarmManager.INTERVAL_HOUR;
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static open.com.permissionsmanager.ValidatePermissionsBroadcastReceiver.GENERIC_REQUEST_CODE;
 
@@ -29,7 +32,7 @@ public class Utils {
     public static final String SHARED_PREF_KEY_LAST_SCAN_TIME = "LAST_SCAN_TIME";
     public static final int ONE_MINUTE = 60 * 1000;
     public static final int FIVE_MINUTES = 5 * ONE_MINUTE;
-    public static final long ALARM_INTERVAL = INTERVAL_HOUR;
+    public static final long ALARM_INTERVAL = ONE_MINUTE * 30;
 
     public static SharedPreferences getSharedPreferences(Context context) {
         return context.getSharedPreferences(context.getString(R.string.permissions_manager), context.MODE_PRIVATE);
@@ -53,6 +56,10 @@ public class Utils {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, GENERIC_REQUEST_CODE, getIntentToBroadcastValidatePermissions(context), FLAG_UPDATE_CURRENT);
         alarmManager.cancel(pendingIntent);
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + ALARM_INTERVAL, pendingIntent);
+        // Calendar calInstance = Calendar.getInstance();
+        // calInstance.add(Calendar.SECOND, (int)(ALARM_INTERVAL/1000));
+        //
+        // notify("Alarm scheduled", calInstance.getTime().toString(), 2738, context);
     }
 
     public static void sort(List<AndroidApplication> applications) {
@@ -104,5 +111,18 @@ public class Utils {
                 .edit()
                 .putLong(SHARED_PREF_KEY_LAST_SCAN_TIME, System.currentTimeMillis())
                 .apply();
+    }
+
+    public static void notify(String title, String content, int notificationCode, Context context) {
+        final NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification notification = new NotificationCompat.Builder(context, "6684")
+                .setSmallIcon(R.drawable.ic_warning_black_24dp)
+                .setTicker(content)
+                .setContentText(content)
+                .setContentTitle(title)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .build();
+        notificationManager.notify(6684, notification);
     }
 }

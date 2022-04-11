@@ -10,6 +10,7 @@ import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static java.util.Calendar.MONTH;
@@ -25,8 +26,9 @@ public class ValidatePermissionsBroadcastReceiver extends BroadcastReceiver{
 
     @Override
     public void onReceive(final Context context, Intent intent) {
+        // Utils.notify("Woke up", new Date().toString(), 9653, context);
         if(!SCAN.equals(intent.getAction())) return;
-        if(Utils.shouldSetAlarm(context)) setAlarm(context);
+        setAlarm(context);
         System.out.println("validate permissions broadcast reciever yolo " + intent);
         Utils.updateLastAlarmTime(context);
         pendingResult = goAsync();
@@ -76,7 +78,7 @@ public class ValidatePermissionsBroadcastReceiver extends BroadcastReceiver{
     private void warnAboutPermissionsLurking(Context context, NotificationManager notificationManager) {
         notificationManager.cancel(FOUR_HOURLY_SCAN_RESULT_NOTIICATION_CODE);
 
-        Notification notification = new NotificationCompat.Builder(context)
+        Notification notification = new NotificationCompat.Builder(context, ""+FOUR_HOURLY_SCAN_RESULT_NOTIICATION_CODE)
                 .setSmallIcon(R.drawable.ic_warning_black_24dp)
                 .setTicker(context.getString(R.string.apps_with_dangerous_permissions_lurking))
                 .setContentText(context.getString(R.string.apps_with_dangerous_permissions_lurking))
@@ -90,7 +92,7 @@ public class ValidatePermissionsBroadcastReceiver extends BroadcastReceiver{
     }
 
     private void warnAboutIgnoredApps(Context context, NotificationManager notificationManager) {
-        Notification notification = new NotificationCompat.Builder(context)
+        Notification notification = new NotificationCompat.Builder(context, "" + GENERIC_REQUEST_CODE)
                 .setSmallIcon(R.drawable.ic_warning_black_24dp)
                 .setTicker(context.getString(R.string.look_ignored_apps))
                 .setContentText(context.getString(R.string.look_ignored_apps))

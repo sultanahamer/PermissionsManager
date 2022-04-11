@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
     @Override
     protected void onResume() {
         super.onResume();
-        setAlarmInCaseIsNotSet();
+        Utils.setAlarm(this);
         if(Utils.areScanResultsOlderThan5Mins(this)){
             scanApplications();
             showSpinner();
@@ -56,12 +56,6 @@ public class MainActivity extends AppCompatActivity implements ApplicationDataba
                 applicationsDatabase.updateApplicationsDatabase();
             }
         }.start();
-    }
-
-    private void setAlarmInCaseIsNotSet() {
-        if(Utils.shouldSetAlarm(this)){
-            Utils.setAlarm(this);
-        }
     }
 
     private void setupListViewsAndToggles() {
