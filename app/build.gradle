@@ -6,8 +6,8 @@ android {
         applicationId "open.com.permissionsmanager"
         minSdkVersion 23
         targetSdkVersion 27
-        versionCode 3
-        versionName "3.0"
+        versionCode 4
+        versionName "4.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
