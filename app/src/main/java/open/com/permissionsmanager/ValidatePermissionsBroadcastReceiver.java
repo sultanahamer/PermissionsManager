@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
-import android.support.v4.app.NotificationCompat;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -17,6 +16,8 @@ import static java.util.Calendar.MONTH;
 import static open.com.permissionsmanager.Utils.ONE_MINUTE;
 import static open.com.permissionsmanager.Utils.SCAN;
 import static open.com.permissionsmanager.Utils.setAlarm;
+
+import androidx.core.app.NotificationCompat;
 
 public class ValidatePermissionsBroadcastReceiver extends BroadcastReceiver{
 

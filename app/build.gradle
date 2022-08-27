@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 32
     defaultConfig {
         applicationId "open.com.permissionsmanager"
         minSdkVersion 23
-        targetSdkVersion 27
+        targetSdkVersion 32
         versionCode 4
         versionName "4.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -20,5 +20,5 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'androidx.appcompat:appcompat:1.5.0'
 }

@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.os.SystemClock;
-import android.support.v4.app.NotificationCompat;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -19,6 +18,8 @@ import java.util.List;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static open.com.permissionsmanager.ValidatePermissionsBroadcastReceiver.GENERIC_REQUEST_CODE;
+
+import androidx.core.app.NotificationCompat;
 
 /**
  * Created by sultanm on 1/23/18.
