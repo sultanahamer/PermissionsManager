@@ -37,12 +37,12 @@ before_script:
   - wget --output-document=$ANDROID_HOME/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
   # move to the archive at ANDROID_HOME
   - pushd $ANDROID_HOME
-  - unzip -d cmdline-tools cmdline-tools.zip
+  - unzip -d . cmdline-tools.zip
   - popd
-  - export PATH=$PATH:${ANDROID_HOME}/cmdline-tools/tools/bin/
+  - export PATH=$PATH:${ANDROID_HOME}/cmdline-tools/bin/
 
   # Nothing fancy here, just checking sdkManager version
-  - sdkmanager --version
+  - sdkmanager --sdk_root=${ANDROID_HOME} --version
 
   # use yes to accept all licenses
   - yes | sdkmanager --sdk_root=${ANDROID_HOME} --licenses || true
