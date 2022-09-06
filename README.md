@@ -1,3 +1,6 @@
+# MOVING THE CODE TO GITLAB AND ARCHIVING THIS REPOSITORY. YOU CAN FOLLOW THE DEVELOPMENT ON GITLAB AT https://gitlab.com/sultanahamer/PermissionsManager
+
+
 # PermissionsManager
 An android app to alert user of potential dangerous permissions given to apps installed
 
